@@ -1,0 +1,26 @@
+{
+  "name": "@lms/db",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "generate": "zen generate",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@zenstackhq/orm": "^3.9.7",
+    "@zenstackhq/schema": "^3.9.7"
+  },
+  "devDependencies": {
+    "@zenstackhq/cli": "^3.9.7",
+    "typescript": "^5.9.3"
+  }
+}

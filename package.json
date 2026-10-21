@@ -1,0 +1,10 @@
+{
+  "name": "lms",
+  "private": true,
+  "scripts": {
+    "dev:backend": "pnpm --filter backend start:dev",
+    "dev:frontend": "pnpm --filter frontend dev",
+    "build": "pnpm -r build",
+    "generate": "pnpm --filter @lms/db generate"
+  }
+}
