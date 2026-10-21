@@ -5,6 +5,10 @@
     "dev:backend": "pnpm --filter backend start:dev",
     "dev:frontend": "pnpm --filter frontend dev",
     "build": "pnpm -r build",
-    "generate": "pnpm --filter @lms/db generate"
+    "generate": "pnpm --filter @lms/db generate && pnpm --filter @lms/db build",
+    "db:push": "export $(grep -v '^#' .env | xargs) && pnpm --filter @lms/db db:push",
+    "studio": "export $(grep -v '^#' .env | xargs) && pnpm --filter @lms/db studio",
+    "graph:build": "GRAPHIFY_NO_AUTO_REFRESH=1 .venv/bin/graphify extract . --code-only && GRAPHIFY_NO_AUTO_REFRESH=1 .venv/bin/graphify export html && GRAPHIFY_NO_AUTO_REFRESH=1 .venv/bin/graphify cluster-only .",
+    "graph:query": "GRAPHIFY_NO_AUTO_REFRESH=1 .venv/bin/graphify query"
   }
 }

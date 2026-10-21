@@ -3,17 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
   "exports": {
     ".": {
-      "types": "./src/index.ts",
-      "default": "./src/index.ts"
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
     }
   },
   "scripts": {
     "generate": "zen generate",
-    "typecheck": "tsc --noEmit"
+    "db:push": "zen db push",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "studio": "zen studio"
   },
   "dependencies": {
     "@zenstackhq/orm": "^3.9.7",

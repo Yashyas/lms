@@ -8,7 +8,7 @@
 import { type SchemaDef, type AttributeApplication, type FieldDefault, ExpressionUtils } from "@zenstackhq/schema";
 export class SchemaType implements SchemaDef {
     provider = {
-        type: "sqlite"
+        type: "postgresql"
     } as const;
     models = {
         User: {

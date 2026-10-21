@@ -8,7 +8,11 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "outDir": "./dist"
   },
-  "include": ["src/**/*", "zenstack/**/*"]
+  "include": [
+    "src/**/*",
+    "zenstack/**/*"
+  ]
 }
