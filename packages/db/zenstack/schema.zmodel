@@ -1,14 +1,72 @@
 datasource db {
     provider = 'postgresql'
-    url = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+    url = env('DATABASE_URL')
+    directUrl = env('DIRECT_URL')
 }
 
 /// User model
 model User {
-    id       String @id @default(cuid())
-    email    String @unique @email @length(6, 32)
-    posts    Post[]
+    id            String    @id @default(cuid())
+    email         String    @unique @email @length(6, 32)
+    posts         Post[]
+    name          String
+    emailVerified Boolean   @default(false)
+    image         String?
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @default(now()) @updatedAt
+    sessions      Session[]
+    accounts      Account[]
+    role          String?
+    banned        Boolean?  @default(false)
+    banReason     String?
+    banExpires    DateTime?
+
+    @@map('user')
+}
+
+model Session {
+    id             String   @id
+    expiresAt      DateTime
+    token          String   @unique
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+    ipAddress      String?
+    userAgent      String?
+    userId         String
+    user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    impersonatedBy String?
+
+    @@map('session')
+}
+
+model Account {
+    id                    String    @id
+    accountId             String
+    providerId            String
+    userId                String
+    user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    accessToken           String?
+    refreshToken          String?
+    idToken               String?
+    accessTokenExpiresAt  DateTime?
+    refreshTokenExpiresAt DateTime?
+    scope                 String?
+    password              String?
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime  @updatedAt
+
+    @@map('account')
+}
+
+model Verification {
+    id         String   @id
+    identifier String
+    value      String
+    expiresAt  DateTime
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @default(now()) @updatedAt
+
+    @@map('verification')
 }
 
 /// Post model

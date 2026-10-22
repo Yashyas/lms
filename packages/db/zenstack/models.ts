@@ -11,6 +11,9 @@ import type { ModelResult as $ModelResult } from "@zenstackhq/orm";
  * User model
  */
 export type User = $ModelResult<$Schema, "User">;
+export type Session = $ModelResult<$Schema, "Session">;
+export type Account = $ModelResult<$Schema, "Account">;
+export type Verification = $ModelResult<$Schema, "Verification">;
 /**
  * Post model
  */

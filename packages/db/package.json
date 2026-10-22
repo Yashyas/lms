@@ -19,11 +19,11 @@
     "studio": "zen studio"
   },
   "dependencies": {
-    "@zenstackhq/orm": "^3.9.7",
-    "@zenstackhq/schema": "^3.9.7"
+    "@zenstackhq/orm": "^3.9.8",
+    "@zenstackhq/schema": "^3.9.8"
   },
   "devDependencies": {
-    "@zenstackhq/cli": "^3.9.7",
+    "@zenstackhq/cli": "^3.9.8",
     "typescript": "^5.9.3"
   }
 }
