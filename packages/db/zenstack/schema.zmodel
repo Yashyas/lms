@@ -4,11 +4,14 @@ datasource db {
     directUrl = env('DIRECT_URL')
 }
 
+plugin policy {
+    provider = "@zenstackhq/plugin-policy"
+}
+
 /// User model
 model User {
     id            String    @id @default(cuid())
-    email         String    @unique @email @length(6, 32)
-    posts         Post[]
+    email         String    @unique @email @length(6, 255)
     name          String
     emailVerified Boolean   @default(false)
     image         String?
@@ -20,6 +23,13 @@ model User {
     banned        Boolean?  @default(false)
     banReason     String?
     banExpires    DateTime?
+
+    coursesTaught Course[]  @relation("InstructorCourses")
+    enrollments   Enrollment[]
+
+    @@allow('read',true)
+    @@allow('update', auth().id == id || auth().role == 'admin')
+    @@allow('all', auth().role == 'admin')
 
     @@map('user')
 }
@@ -36,6 +46,7 @@ model Session {
     user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
     impersonatedBy String?
 
+    @@allow('all',auth().id == userId || auth().role == 'admin')
     @@map('session')
 }
 
@@ -55,6 +66,7 @@ model Account {
     createdAt             DateTime  @default(now())
     updatedAt             DateTime  @updatedAt
 
+    @@allow('all', auth().id == userId || auth().role == 'admin')
     @@map('account')
 }
 
@@ -69,14 +81,57 @@ model Verification {
     @@map('verification')
 }
 
-/// Post model
-model Post {
-    id        String   @id @default(cuid())
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-    title     String   @length(1, 256)
-    content   String
-    published Boolean  @default(false)
-    author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-    authorId  String
+model Course {
+    id          String      @id @default(cuid())
+    title       String      @length(3, 256)
+    slug        String      @unique
+    description String?    
+    price       Int         @default(0) //stored in paise/INR
+    published   Boolean     @default(false)
+    instructorId String     @default(auth().id)
+    instructor   User       @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
+    lessons      Lesson[]
+    enrollments  Enrollment[]
+    createdAt    DateTime   @default(now())
+    updatedAt    DateTime   @updatedAt
+
+    @@allow('read',published || auth().id == instructorId || auth().role == 'admin')
+    @@allow('create', auth().role == 'instructor' || auth().role == 'admin')
+    @@allow('update,delete', auth().id == instructorId || auth().role == 'admin')
+    
+    @@map('course')
+}
+
+model Lesson {
+    id         String    @id @default(cuid())
+    title      String    @length(1,256)
+    content    String?
+    videoUrl   String?
+    position   Int        @default(0)
+    isFree     Boolean    @default(false)
+    courseId   String
+    course     Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+
+    @@allow('read', isFree || course.instructorId == auth().id || auth().role == 'admin' || course.enrollments?[userId == auth().id])
+    @@allow('create,update,delete', course.instructorId == auth().id || auth().role == 'admin')
+
+    @@map('lesson')
+}
+
+model Enrollment {
+    id          String      @id @default(cuid())
+    userId      String      @default(auth().id)
+    user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    courseId    String      
+    course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    createdAt   DateTime    @default(now())
+
+    @@unique([userId, courseId])
+    @@allow('read,create', auth().id == userId || auth().role == 'admin')
+    @@allow('read', course.instructorId == auth().id)
+    @@allow('delete',auth().role == 'admin')
+    @@map('enrollment')
+
 }

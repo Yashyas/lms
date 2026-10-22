@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@zenstackhq/orm": "^3.9.8",
+    "@zenstackhq/plugin-policy": "^3.9.8",
     "@zenstackhq/schema": "^3.9.8"
   },
   "devDependencies": {

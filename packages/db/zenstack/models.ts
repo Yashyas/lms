@@ -14,7 +14,6 @@ export type User = $ModelResult<$Schema, "User">;
 export type Session = $ModelResult<$Schema, "Session">;
 export type Account = $ModelResult<$Schema, "Account">;
 export type Verification = $ModelResult<$Schema, "Verification">;
-/**
- * Post model
- */
-export type Post = $ModelResult<$Schema, "Post">;
+export type Course = $ModelResult<$Schema, "Course">;
+export type Lesson = $ModelResult<$Schema, "Lesson">;
+export type Enrollment = $ModelResult<$Schema, "Enrollment">;

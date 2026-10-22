@@ -3,21 +3,11 @@ import { zenstackAdapter } from '@zenstackhq/better-auth';
 import { schema, ZenStackClient, PostgresDialect } from '@lms/db';
 import { Pool } from 'pg';
 import { admin, bearer } from 'better-auth/plugins';
+import { rawDbClient } from '../db-pool/db-pool.service.js';
 
-try { process.loadEnvFile('.env'); } catch { }
-try { process.loadEnvFile('../.env'); } catch { }
-
-// For CLI generation and runtime, it needs a ZenStackClient instance
-const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-});
-
-const client = new ZenStackClient(schema, {
-    dialect: new PostgresDialect({ pool }),
-});
 
 export const auth = betterAuth({
-    database: zenstackAdapter(client as any, {
+    database: zenstackAdapter(rawDbClient as any, {
         provider: 'postgresql',
     }),
 

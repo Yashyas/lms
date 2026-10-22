@@ -1,31 +1,30 @@
 // backend/src/db-pool/database.service.ts
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Pool } from 'pg';
 import { PostgresDialect, schema, ZenStackClient } from '@lms/db';
+
+try { process.loadEnvFile('.env'); } catch { }
+try { process.loadEnvFile('../.env'); } catch { }
+
+export const pgPool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: 20,
+});
+
+export const rawDbClient = new ZenStackClient(schema, {
+  dialect: new PostgresDialect({ pool: pgPool }),
+});
 
 @Injectable()
 export class DbPoolService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DbPoolService.name);
-  public pool!: Pool;
-  public client!: InstanceType<typeof ZenStackClient<typeof schema>>;
-
-  constructor(private readonly configService: ConfigService) { }
+  public readonly pool = pgPool;
+  public readonly client = rawDbClient;
 
   async onModuleInit() {
-    const connectionString = this.configService.getOrThrow<string>('DATABASE_URL');
-
-    this.pool = new Pool({
-      connectionString,
-      max: 20,
-    });
 
     this.pool.on('error', (err) => {
       this.logger.error('Unexpected error on idle pg client', err);
-    });
-
-    this.client = new ZenStackClient(schema, {
-      dialect: new PostgresDialect({ pool: this.pool }),
     });
 
     try {
