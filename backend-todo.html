@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS Backend Engineering Roadmap & Todo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-subtle: #f4f4f5;
+      --surface-border: #e4e4e7;
+      --surface-border-strong: #d4d4d8;
+      --text: #09090b;
+      --text-muted: #71717a;
+      --text-subtle: #a1a1aa;
+      --accent: #18181b;
+      --accent-contrast: #ffffff;
+      --tag-bg: #f4f4f5;
+      --tag-border: #e4e4e7;
+      --tag-text: #27272a;
+      --method-get: #27272a;
+      --method-post: #09090b;
+      --method-patch: #3f3f46;
+      --method-delete: #18181b;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+      --radius: 10px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-subtle: #18181b;
+      --surface-border: #27272a;
+      --surface-border-strong: #3f3f46;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-subtle: #71717a;
+      --accent: #f4f4f5;
+      --accent-contrast: #09090b;
+      --tag-bg: #1c1c20;
+      --tag-border: #27272a;
+      --tag-text: #e4e4e7;
+      --method-get: #e4e4e7;
+      --method-post: #ffffff;
+      --method-patch: #d4d4d8;
+      --method-delete: #f4f4f5;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.6);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1080px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 48px 0 32px 0;
+      border-bottom: 1px solid var(--surface-border);
+      background-color: var(--surface);
+      margin-bottom: 32px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .brand-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .brand-eyebrow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--text);
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 620px;
+    }
+
+    /* Actions & Theme */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      color: var(--text);
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--surface-border-strong);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.92;
+      background: var(--accent);
+    }
+
+    .theme-toggle {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+      border-radius: 8px;
+    }
+
+    /* Global Progress Dashboard */
+    .progress-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .progress-label-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .progress-title {
+      font-size: 14px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .progress-stats {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .progress-percentage {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      background: var(--surface-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--surface-border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      width: 0%;
+      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      padding-top: 12px;
+      border-top: 1px solid var(--surface-border);
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .stat-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    /* Filters Bar */
+    .controls-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 260px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 10px 14px 10px 38px;
+      font-size: 14px;
+      color: var(--text);
+      outline: none;
+      transition: var(--transition);
+      font-family: inherit;
+    }
+
+    .search-input:focus {
+      border-color: var(--text);
+      box-shadow: 0 0 0 2px rgba(120, 120, 120, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 16px;
+      height: 16px;
+    }
+
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .filter-btn:hover {
+      color: var(--text);
+      border-color: var(--surface-border-strong);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border-color: var(--accent);
+    }
+
+    /* Phase Section */
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+      overflow: hidden;
+      transition: var(--transition);
+    }
+
+    .phase-header {
+      padding: 20px 24px;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    .phase-header:hover {
+      background: var(--surface-subtle);
+    }
+
+    .phase-title-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .phase-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      color: var(--text);
+    }
+
+    .phase-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .phase-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .phase-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .phase-progress-text {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .chevron {
+      width: 18px;
+      height: 18px;
+      color: var(--text-subtle);
+      transition: transform 0.2s ease;
+    }
+
+    .phase-card.collapsed .chevron {
+      transform: rotate(-90deg);
+    }
+
+    .phase-card.collapsed .task-list {
+      display: none;
+    }
+
+    /* Tasks List */
+    .task-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .task-item {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: background 0.15s ease;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item:hover {
+      background: var(--surface-subtle);
+    }
+
+    .task-checkbox-wrap {
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+    }
+
+    .task-checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--surface-border-strong);
+      border-radius: 5px;
+      background: var(--surface);
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      transition: var(--transition);
+    }
+
+    .task-checkbox:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .task-checkbox:checked::before {
+      content: "";
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid var(--accent-contrast);
+      border-bottom: 2px solid var(--accent-contrast);
+      transform: rotate(-45deg) translate(0.5px, -0.5px);
+    }
+
+    .task-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .task-header-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .task-name {
+      font-size: 14.5px;
+      font-weight: 600;
+      color: var(--text);
+      transition: color 0.15s ease;
+    }
+
+    .task-item.completed .task-name {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .task-badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pill-p0 {
+      background: var(--accent);
+      color: var(--accent-contrast);
+    }
+
+    .pill-p1 {
+      border: 1px solid var(--surface-border-strong);
+      color: var(--text);
+      background: var(--surface-subtle);
+    }
+
+    .pill-p2 {
+      border: 1px dashed var(--surface-border-strong);
+      color: var(--text-muted);
+    }
+
+    .pill-method {
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .task-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .task-details {
+      margin-top: 6px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1.6;
+    }
+
+    .task-details code {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      padding: 1px 5px;
+      border-radius: 4px;
+      color: var(--text);
+    }
+
+    /* Notification Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-top {
+        flex-direction: column;
+      }
+      .controls-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .search-input-wrapper {
+        min-width: 100%;
+      }
+      .filter-pills {
+        justify-content: flex-start;
+      }
+      .phase-meta {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <div>
+          <div class="brand-eyebrow">Interactive Project Tracker</div>
+          <h1>LMS Backend Architecture & Roadmap</h1>
+          <p class="subtitle">Complete step-by-step implementation guide to turn your NestJS + ZenStack + Better-Auth backend into a production LMS engine.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn theme-toggle" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+            <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+          <button class="btn" id="resetBtn" title="Reset all progress">Reset</button>
+          <button class="btn btn-primary" id="exportBtn" title="Export progress JSON">Export</button>
+        </div>
+      </div>
+
+      <!-- Overall Progress Card -->
+      <div class="progress-card">
+        <div class="progress-header">
+          <div class="progress-label-wrap">
+            <span class="progress-title">Overall Backend Completion</span>
+            <div class="progress-stats"><span id="completedCount">0</span> / <span id="totalCount">0</span> Tasks</div>
+          </div>
+          <div class="progress-percentage"><span id="percentVal">0</span>%</div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">Pending</span>
+            <span class="stat-val" id="pendingStat">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Critical (P0)</span>
+            <span class="stat-val" id="p0Stat">0/0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Core (P1)</span>
+            <span class="stat-val" id="p1Stat">0/0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Polish (P2)</span>
+            <span class="stat-val" id="p2Stat">0/0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Controls & Search -->
+      <div class="controls-bar">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" id="searchInput" placeholder="Search tasks, methods, endpoints (e.g. 'POST', 'course', 's3')...">
+        </div>
+        <div class="filter-pills">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="pending">Pending</button>
+          <button class="filter-btn" data-filter="completed">Completed</button>
+          <button class="filter-btn" data-filter="p0">P0 Critical</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="phasesContainer">
+    <!-- Rendered dynamically by JavaScript -->
+  </main>
+
+  <div class="toast" id="toast">Changes saved to localStorage</div>
+
+  <script>
+    // --- Detailed Data Model for Backend LMS Todo ---
+    const ROADMAP_DATA = [
+      {
+        id: "phase-1",
+        number: "Phase 01",
+        title: "Schema Upgrades & Storage Foundation",
+        desc: "Add missing LMS schema models (LessonProgress, Course thumbnail) and build the S3 upload service for videos.",
+        tasks: [
+          {
+            id: "t-1-1",
+            title: "Add LessonProgress Model to schema.zmodel",
+            priority: "P0",
+            method: "SCHEMA",
+            desc: "Define student lesson completion tracking in packages/db/zenstack/schema.zmodel with @@allow policies so students can record and view their own progress.",
+            details: "Model fields: id (cuid), userId, user, lessonId, lesson, completed (Boolean), completedAt (DateTime?). @@unique([userId, lessonId]). Policies: allow('read,create,update', auth().id == userId || auth().role == 'admin')."
+          },
+          {
+            id: "t-1-2",
+            title: "Add Thumbnail and Level to Course Model",
+            priority: "P1",
+            method: "SCHEMA",
+            desc: "Enrich Course model with thumbnail URL and level (beginner/intermediate/advanced) to support rich frontend course listings.",
+            details: "Add: thumbnail String?, level String @default('all_levels'). Run 'pnpm generate' & 'pnpm db:push' to update local PostgreSQL schema."
+          },
+          {
+            id: "t-1-3",
+            title: "Setup Local S3 Bucket in Garage Object Storage",
+            priority: "P0",
+            method: "INFRA",
+            desc: "Verify Garage S3 container in docker-compose.yml (port 3900) is running, create an S3 bucket ('lms-media') and access key/secret.",
+            details: "Command: docker exec -it lms-garage /garage bucket create lms-media && docker exec -it lms-garage /garage key create lms-key. Store keys in .env as S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET."
+          },
+          {
+            id: "t-1-4",
+            title: "Implement StorageModule with AWS S3 Presigned URLs",
+            priority: "P0",
+            method: "SERVICE",
+            desc: "Create backend/src/storage/storage.service.ts using @aws-sdk/client-s3 and @aws-sdk/s3-request-presigner.",
+            details: "Provide getPresignedUploadUrl(key, contentType, expiresIn) and getPresignedViewUrl(key, expiresIn) so videos are securely streamed via short-lived signed URLs without overloading the NestJS server."
+          }
+        ]
+      },
+      {
+        id: "phase-2",
+        number: "Phase 02",
+        title: "Courses Module (Core Catalog & Instructor Authoring)",
+        desc: "Course creation, catalog browsing, published state management, and instructor dashboard endpoints.",
+        tasks: [
+          {
+            id: "t-2-1",
+            title: "Generate CourseModule, Controller & Service",
+            priority: "P0",
+            method: "MODULE",
+            desc: "Scaffold courses module in backend/src/courses/ registered in AppModule.",
+            details: "Inject DbPoolService. In every authenticated route, call this.db.forUser(session.user) to let ZenStack automatically enforce instructor/student boundaries."
+          },
+          {
+            id: "t-2-2",
+            title: "GET /courses — Public Course Catalog",
+            priority: "P0",
+            method: "GET",
+            desc: "Public endpoint allowing anyone to browse published courses with pagination and keyword search.",
+            details: "Use @AllowAnonymous(). Query db.course.findMany({ where: { published: true, title: { contains: search } }, take, skip, include: { instructor: { select: { name: true, image: true } }, _count: { select: { lessons: true, enrollments: true } } } })."
+          },
+          {
+            id: "t-2-3",
+            title: "GET /courses/:slug — Course Details & Syllabus Preview",
+            priority: "P0",
+            method: "GET",
+            desc: "Fetch public course details by slug with lesson syllabus (titles & free status, hiding private video links).",
+            details: "@AllowAnonymous(). Query db.course.findUnique({ where: { slug }, include: { instructor: true, lessons: { select: { id: true, title: true, position: true, isFree: true } } } })."
+          },
+          {
+            id: "t-2-4",
+            title: "POST /courses — Create Course (Instructor Only)",
+            priority: "P0",
+            method: "POST",
+            desc: "Instructors create new course drafts (slug auto-generated or validated unique).",
+            details: "Guard: @Roles(['instructor', 'admin']). Body: { title, slug, description, price, thumbnail }. Execute via this.db.forUser(session.user).course.create(...). InstructorId defaults to auth().id automatically."
+          },
+          {
+            id: "t-2-5",
+            title: "GET /courses/instructor/mine — Instructor's Courses",
+            priority: "P1",
+            method: "GET",
+            desc: "Return all draft and published courses authored by the current instructor with enrollment counts.",
+            details: "Call this.db.forUser(session.user).course.findMany({ where: { instructorId: session.user.id }, include: { _count: { select: { lessons: true, enrollments: true } } } })."
+          },
+          {
+            id: "t-2-6",
+            title: "PATCH /courses/:id — Update Course Details",
+            priority: "P1",
+            method: "PATCH",
+            desc: "Update course metadata, pricing, description, or thumbnail.",
+            details: "Policy ensures only course instructor or admin can update. Returns updated course."
+          },
+          {
+            id: "t-2-7",
+            title: "PATCH /courses/:id/publish — Toggle Course Publication",
+            priority: "P1",
+            method: "PATCH",
+            desc: "Publish or unpublish course. Validates course has at least 1 lesson before publishing.",
+            details: "Check lesson count >= 1 before setting published: true. Returns 400 if course has no lessons."
+          },
+          {
+            id: "t-2-8",
+            title: "DELETE /courses/:id — Delete Course",
+            priority: "P1",
+            method: "DELETE",
+            desc: "Delete course and cascade delete associated lessons and enrollments.",
+            details: "ZenStack policy checks instructor ownership or admin."
+          }
+        ]
+      },
+      {
+        id: "phase-3",
+        number: "Phase 03",
+        title: "Lessons Module (Curriculum & Video Streaming)",
+        desc: "Curriculum ordering, video uploads via signed URLs, and policy-guarded lesson access.",
+        tasks: [
+          {
+            id: "t-3-1",
+            title: "Generate LessonModule, Controller & Service",
+            priority: "P0",
+            method: "MODULE",
+            desc: "Scaffold lessons module in backend/src/lessons/ registered in AppModule.",
+            details: "Integrate with StorageService to attach S3 video keys and generate viewing URLs."
+          },
+          {
+            id: "t-3-2",
+            title: "POST /courses/:courseId/lessons — Add Lesson",
+            priority: "P0",
+            method: "POST",
+            desc: "Instructors append a new lesson (title, markdown content, videoKey, isFree).",
+            details: "Calculates next position index automatically (count + 1). ZenStack policy confirms user owns the course."
+          },
+          {
+            id: "t-3-3",
+            title: "GET /lessons/:id — View Lesson (Protected)",
+            priority: "P0",
+            method: "GET",
+            desc: "Stream lesson content and generate presigned video URL if student is enrolled or lesson isFree.",
+            details: "Query lesson via this.db.forUser(session.user). If ZenStack policy passes, call storageService.getPresignedViewUrl(lesson.videoUrl) and return to student."
+          },
+          {
+            id: "t-3-4",
+            title: "PUT /courses/:courseId/lessons/reorder — Reorder Curriculum",
+            priority: "P1",
+            method: "PUT",
+            desc: "Batch update lesson sequence numbers (drag & drop in frontend).",
+            details: "Body: { lessonIds: string[] }. Execute inside transaction: loop and update position: index."
+          },
+          {
+            id: "t-3-5",
+            title: "PATCH /lessons/:id & DELETE /lessons/:id",
+            priority: "P1",
+            method: "PATCH",
+            desc: "Update lesson title, markdown content, or video file, or delete lesson.",
+            details: "Re-calculates remaining positions on deletion if needed."
+          }
+        ]
+      },
+      {
+        id: "phase-4",
+        number: "Phase 04",
+        title: "Enrollments & Student Learning Progress",
+        desc: "Course enrollment logic, student dashboard, and tracking completed lessons.",
+        tasks: [
+          {
+            id: "t-4-1",
+            title: "POST /courses/:courseId/enroll — Student Enrollment",
+            priority: "P0",
+            method: "POST",
+            desc: "Enrolls current authenticated student into a course.",
+            details: "Validates course is published. For free courses (price == 0), creates enrollment record directly. For paid courses, prepares order / webhook."
+          },
+          {
+            id: "t-4-2",
+            title: "GET /enrollments/mine — Student Enrolled Courses",
+            priority: "P0",
+            method: "GET",
+            desc: "Returns list of courses student is currently enrolled in with their calculated progress percentage.",
+            details: "Finds enrollments where userId == session.user.id, includes course, lessons count, and completed lessons count."
+          },
+          {
+            id: "t-4-3",
+            title: "GET /courses/:courseId/enrollment-status",
+            priority: "P1",
+            method: "GET",
+            desc: "Quick check used by frontend course page to display 'Enroll Now' vs. 'Continue Learning' button.",
+            details: "Returns { isEnrolled: boolean, enrolledAt: DateTime? }."
+          },
+          {
+            id: "t-4-4",
+            title: "POST /lessons/:lessonId/progress — Toggle Lesson Complete",
+            priority: "P0",
+            method: "POST",
+            desc: "Student marks a lesson as completed or uncompleted.",
+            details: "Upserts LessonProgress record for (userId, lessonId) setting completed: boolean and completedAt: now()."
+          },
+          {
+            id: "t-4-5",
+            title: "GET /courses/:courseId/progress — Overall Course Progress",
+            priority: "P1",
+            method: "GET",
+            desc: "Calculates percentage completed and list of completed lesson IDs for current student.",
+            details: "Returns { completedLessons: string[], totalLessons: number, percentage: number }."
+          }
+        ]
+      },
+      {
+        id: "phase-5",
+        number: "Phase 05",
+        title: "User Profile, Roles & Admin Controls",
+        desc: "Profile management, instructor role switching, and administrator moderation.",
+        tasks: [
+          {
+            id: "t-5-1",
+            title: "GET /users/me & PATCH /users/me — Profile Management",
+            priority: "P1",
+            method: "GET",
+            desc: "View and update user name, bio, and avatar image.",
+            details: "Consumes Better-Auth session and updates User record."
+          },
+          {
+            id: "t-5-2",
+            title: "POST /users/become-instructor — Role Switcher",
+            priority: "P1",
+            method: "POST",
+            desc: "Allows a student to upgrade their account to an instructor so they can create courses.",
+            details: "Updates user.role to 'instructor' via Better-Auth admin client or rawDbClient.user.update."
+          },
+          {
+            id: "t-5-3",
+            title: "GET /admin/stats — Platform Analytics",
+            priority: "P2",
+            method: "GET",
+            desc: "Dashboard metrics for administrators: total users, total students, total instructors, total courses, total enrollments.",
+            details: "Guarded by @Roles(['admin']). Runs fast count aggregates across models."
+          },
+          {
+            id: "t-5-4",
+            title: "GET /admin/users & PATCH /admin/users/:id/ban — User Moderation",
+            priority: "P2",
+            method: "PATCH",
+            desc: "Admins view all users and can ban/unban or change roles.",
+            details: "Leverages Better-Auth's built-in admin plugin (auth.api.banUser / unbanUser)."
+          }
+        ]
+      },
+      {
+        id: "phase-6",
+        number: "Phase 06",
+        title: "Production Hardening: Validation, Caching & Swagger",
+        desc: "DTO validation pipes, standardized API responses, Swagger documentation, and Redis caching.",
+        tasks: [
+          {
+            id: "t-6-1",
+            title: "Setup Global ValidationPipe with class-validator",
+            priority: "P0",
+            method: "CONFIG",
+            desc: "Ensure all request payloads are validated, stripped of unknown properties, and type-coerced.",
+            details: "In main.ts: app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }))."
+          },
+          {
+            id: "t-6-2",
+            title: "Global Exception Filter for ZenStack Policy Errors",
+            priority: "P0",
+            method: "CONFIG",
+            desc: "Catch ZenStack access-policy violations or ORM errors and cleanly convert them to HTTP 403 Forbidden or 404 Not Found.",
+            details: "Create backend/src/common/filters/zenstack-exception.filter.ts."
+          },
+          {
+            id: "t-6-3",
+            title: "Install Swagger OpenAPI Documentation (@nestjs/swagger)",
+            priority: "P1",
+            method: "DOCS",
+            desc: "Expose interactive OpenAPI documentation at http://localhost:3000/api/docs.",
+            details: "Install @nestjs/swagger. Configure DocumentBuilder in main.ts with Bearer auth support."
+          },
+          {
+            id: "t-6-4",
+            title: "Redis Caching for Public Catalog (GET /courses)",
+            priority: "P2",
+            method: "CACHE",
+            desc: "Use local Redis container (port 6379) to cache public catalog responses with 60-second TTL.",
+            details: "Invalidate cache whenever a course is published or updated."
+          }
+        ]
+      }
+    ];
+
+    // --- State Management with LocalStorage ---
+    const STORAGE_KEY = "lms_backend_roadmap_state_v1";
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        console.error("Failed to load state", e);
+        return {};
+      }
+    }
+
+    function saveState(state) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        showToast("Progress saved to localStorage");
+      } catch (e) {
+        console.error("Failed to save state", e);
+      }
+    }
+
+    let appState = loadState();
+    let currentFilter = "all";
+    let searchQuery = "";
+
+    // --- DOM Elements ---
+    const phasesContainer = document.getElementById("phasesContainer");
+    const completedCountEl = document.getElementById("completedCount");
+    const totalCountEl = document.getElementById("totalCount");
+    const percentValEl = document.getElementById("percentVal");
+    const progressFillEl = document.getElementById("progressFill");
+    const pendingStatEl = document.getElementById("pendingStat");
+    const p0StatEl = document.getElementById("p0Stat");
+    const p1StatEl = document.getElementById("p1Stat");
+    const p2StatEl = document.getElementById("p2Stat");
+    const searchInput = document.getElementById("searchInput");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const exportBtn = document.getElementById("exportBtn");
+    const toast = document.getElementById("toast");
+
+    // --- Theme Handling ---
+    function initTheme() {
+      const savedTheme = localStorage.getItem("lms_theme") || 
+        (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", savedTheme);
+      updateThemeIcon(savedTheme);
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute("data-theme");
+      const next = current === "dark" ? "light" : "dark";
+      document.documentElement.setAttribute("data-theme", next);
+      localStorage.setItem("lms_theme", next);
+      updateThemeIcon(next);
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.getElementById("themeIcon");
+      if (theme === "dark") {
+        icon.innerHTML = `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>`;
+      } else {
+        icon.innerHTML = `<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>`;
+      }
+    }
+
+    themeToggleBtn.addEventListener("click", toggleTheme);
+
+    // --- Toast Helper ---
+    let toastTimeout;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    // --- Calculation & Statistics ---
+    function updateStats() {
+      let total = 0;
+      let completed = 0;
+      let p0Total = 0, p0Done = 0;
+      let p1Total = 0, p1Done = 0;
+      let p2Total = 0, p2Done = 0;
+
+      ROADMAP_DATA.forEach(phase => {
+        phase.tasks.forEach(task => {
+          total++;
+          const isDone = !!appState[task.id];
+          if (isDone) completed++;
+
+          if (task.priority === "P0") { p0Total++; if (isDone) p0Done++; }
+          if (task.priority === "P1") { p1Total++; if (isDone) p1Done++; }
+          if (task.priority === "P2") { p2Total++; if (isDone) p2Done++; }
+        });
+      });
+
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      completedCountEl.textContent = completed;
+      totalCountEl.textContent = total;
+      percentValEl.textContent = percent;
+      progressFillEl.style.width = percent + "%";
+      pendingStatEl.textContent = total - completed;
+      p0StatEl.textContent = `${p0Done}/${p0Total}`;
+      p1StatEl.textContent = `${p1Done}/${p1Total}`;
+      p2StatEl.textContent = `${p2Done}/${p2Total}`;
+
+      // Update phase counters
+      ROADMAP_DATA.forEach(phase => {
+        const phaseTasks = phase.tasks;
+        const phaseDone = phaseTasks.filter(t => !!appState[t.id]).length;
+        const el = document.getElementById(`phase-counter-${phase.id}`);
+        if (el) {
+          el.textContent = `${phaseDone} / ${phaseTasks.length} done`;
+        }
+      });
+    }
+
+    // --- Render Roadmap ---
+    function renderRoadmap() {
+      phasesContainer.innerHTML = "";
+
+      ROADMAP_DATA.forEach(phase => {
+        // Filter tasks
+        const filteredTasks = phase.tasks.filter(task => {
+          const isDone = !!appState[task.id];
+
+          // Filter by status/priority
+          if (currentFilter === "pending" && isDone) return false;
+          if (currentFilter === "completed" && !isDone) return false;
+          if (currentFilter === "p0" && task.priority !== "P0") return false;
+
+          // Filter by search query
+          if (searchQuery.trim() !== "") {
+            const q = searchQuery.toLowerCase();
+            const matchTitle = task.title.toLowerCase().includes(q);
+            const matchDesc = task.desc.toLowerCase().includes(q);
+            const matchMethod = task.method.toLowerCase().includes(q);
+            const matchDetails = (task.details || "").toLowerCase().includes(q);
+            if (!matchTitle && !matchDesc && !matchMethod && !matchDetails) {
+              return false;
+            }
+          }
+
+          return true;
+        });
+
+        // Hide empty phase if filtering
+        if (filteredTasks.length === 0 && (searchQuery || currentFilter !== "all")) {
+          return;
+        }
+
+        const phaseDone = phase.tasks.filter(t => !!appState[t.id]).length;
+
+        const phaseCard = document.createElement("section");
+        phaseCard.className = "phase-card";
+        phaseCard.id = `card-${phase.id}`;
+
+        phaseCard.innerHTML = `
+          <div class="phase-header" data-phase="${phase.id}">
+            <div class="phase-title-group">
+              <span class="phase-badge">${phase.number}</span>
+              <div>
+                <h2 class="phase-title">${phase.title}</h2>
+                <p class="phase-desc">${phase.desc}</p>
+              </div>
+            </div>
+            <div class="phase-meta">
+              <span class="phase-progress-text" id="phase-counter-${phase.id}">
+                ${phaseDone} / ${phase.tasks.length} done
+              </span>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          </div>
+          <ul class="task-list" id="list-${phase.id}"></ul>
+        `;
+
+        const taskList = phaseCard.querySelector(`#list-${phase.id}`);
+
+        filteredTasks.forEach(task => {
+          const isDone = !!appState[task.id];
+          const taskLi = document.createElement("li");
+          taskLi.className = `task-item ${isDone ? "completed" : ""}`;
+          taskLi.id = `item-${task.id}`;
+
+          const priorityClass = task.priority === "P0" ? "pill-p0" : task.priority === "P1" ? "pill-p1" : "pill-p2";
+
+          taskLi.innerHTML = `
+            <div class="task-checkbox-wrap">
+              <input type="checkbox" class="task-checkbox" id="check-${task.id}" ${isDone ? "checked" : ""}>
+            </div>
+            <div class="task-content">
+              <div class="task-header-row">
+                <span class="pill pill-method">${task.method}</span>
+                <span class="pill ${priorityClass}">${task.priority}</span>
+                <span class="task-name">${task.title}</span>
+              </div>
+              <p class="task-desc">${task.desc}</p>
+              ${task.details ? `<div class="task-details">${task.details}</div>` : ""}
+            </div>
+          `;
+
+          // Checkbox change listener
+          const checkbox = taskLi.querySelector(`#check-${task.id}`);
+          checkbox.addEventListener("change", (e) => {
+            const checked = e.target.checked;
+            if (checked) {
+              appState[task.id] = { completed: true, timestamp: new Date().toISOString() };
+              taskLi.classList.add("completed");
+            } else {
+              delete appState[task.id];
+              taskLi.classList.remove("completed");
+            }
+            saveState(appState);
+            updateStats();
+          });
+
+          taskList.appendChild(taskLi);
+        });
+
+        // Toggle Collapse on Header Click
+        const header = phaseCard.querySelector(".phase-header");
+        header.addEventListener("click", () => {
+          phaseCard.classList.toggle("collapsed");
+        });
+
+        phasesContainer.appendChild(phaseCard);
+      });
+
+      updateStats();
+    }
+
+    // --- Search & Filter Listeners ---
+    searchInput.addEventListener("input", (e) => {
+      searchQuery = e.target.value;
+      renderRoadmap();
+    });
+
+    filterButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        filterButtons.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentFilter = btn.dataset.filter;
+        renderRoadmap();
+      });
+    });
+
+    // --- Reset & Export ---
+    resetBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to reset all tracked progress?")) {
+        appState = {};
+        saveState(appState);
+        renderRoadmap();
+        showToast("All progress reset");
+      }
+    });
+
+    exportBtn.addEventListener("click", () => {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState, null, 2));
+      const dlAnchor = document.createElement("a");
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `lms_backend_progress_${new Date().toISOString().slice(0, 10)}.json`);
+      dlAnchor.click();
+      showToast("Progress exported as JSON");
+    });
+
+    // --- Init ---
+    initTheme();
+    renderRoadmap();
+  </script>
+</body>
+</html>

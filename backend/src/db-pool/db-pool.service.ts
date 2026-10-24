@@ -1,7 +1,7 @@
 // backend/src/db-pool/database.service.ts
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { Pool } from 'pg';
-import { PostgresDialect, schema, ZenStackClient } from '@lms/db';
+import { PolicyPlugin, PostgresDialect, schema, ZenStackClient } from '@lms/db';
 
 try { process.loadEnvFile('.env'); } catch { }
 try { process.loadEnvFile('../.env'); } catch { }
@@ -15,11 +15,15 @@ export const rawDbClient = new ZenStackClient(schema, {
   dialect: new PostgresDialect({ pool: pgPool }),
 });
 
+export type AuthUser = { id: string; role?: string | null };
+
 @Injectable()
 export class DbPoolService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DbPoolService.name);
   public readonly pool = pgPool;
   public readonly client = rawDbClient;
+  private readonly protectedClient = this.client.$use(new PolicyPlugin())
+
 
   async onModuleInit() {
 
@@ -36,13 +40,25 @@ export class DbPoolService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
+  forUser(user?: AuthUser | null) {
+    return this.protectedClient.$setAuth(user ?? undefined)
+  }
+
   // Model accessors
   get user() {
     return this.client.user;
   }
 
-  get post() {
-    return this.client.post;
+  get course() {
+    return this.client.course;
+  }
+
+  get lesson() {
+    return this.client.lesson;
+  }
+
+  get enrollment() {
+    return this.client.enrollment;
   }
 
   async onModuleDestroy() {
