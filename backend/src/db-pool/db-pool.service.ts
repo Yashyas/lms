@@ -15,7 +15,7 @@ export const rawDbClient = new ZenStackClient(schema, {
   dialect: new PostgresDialect({ pool: pgPool }),
 });
 
-export type AuthUser = { id: string; role?: string | null };
+export type AuthUser = { id: string; role?: string | string[] | null;[key: string]: any };
 
 @Injectable()
 export class DbPoolService implements OnModuleInit, OnModuleDestroy {
@@ -41,7 +41,12 @@ export class DbPoolService implements OnModuleInit, OnModuleDestroy {
   }
 
   forUser(user?: AuthUser | null) {
-    return this.protectedClient.$setAuth(user ?? undefined)
+    if (!user) return this.protectedClient.$setAuth(undefined);
+    const role = Array.isArray(user.role) ? user.role[0] : (user.role ?? null);
+    return this.protectedClient.$setAuth({
+      ...user,
+      role,
+    });
   }
 
   // Model accessors
