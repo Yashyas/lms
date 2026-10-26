@@ -6,6 +6,7 @@ import { DbPoolModule } from './db-pool/db-pool.module.js';
 import { AuthModule } from '@thallesp/nestjs-better-auth';
 import { auth } from './auth/auth.js';
 import { CoursesModule } from './courses/courses.module.js';
+import { LessonsModule } from './lessons/lessons.module.js';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { CoursesModule } from './courses/courses.module.js';
     }),
     DbPoolModule,
     AuthModule.forRoot({ auth }),
-    CoursesModule
+    CoursesModule,
+    LessonsModule
   ],
   controllers: [AppController],
   providers: [AppService],

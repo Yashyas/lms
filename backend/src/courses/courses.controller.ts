@@ -41,16 +41,16 @@ export class CoursesController {
     return this.coursesService.findOne(id, session.user);
   }
 
-  // update course only instructor and admin can update course
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto, @Session() session: UserSession) {
-    return this.coursesService.update(id, updateCourseDto, session.user);
-  }
-
   // toggle publish status 
   @Patch('publish/:id')
   togglePublish(@Param('id') id: string, @Session() session: UserSession) {
     return this.coursesService.togglePublish(id, session.user);
+  }
+
+  // update course only instructor and admin can update course
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto, @Session() session: UserSession) {
+    return this.coursesService.update(id, updateCourseDto, session.user);
   }
 
   // delete course only instructor and admin can delete course
