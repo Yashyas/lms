@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LMS Stripe Payment Integration Plan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-subtle: #f4f4f5;
+      --surface-border: #e4e4e7;
+      --surface-border-strong: #d4d4d8;
+      --text: #09090b;
+      --text-muted: #71717a;
+      --text-subtle: #a1a1aa;
+      --accent: #18181b;
+      --accent-contrast: #ffffff;
+      --tag-bg: #f4f4f5;
+      --tag-border: #e4e4e7;
+      --code-bg: #f4f4f5;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
+      --radius: 10px;
+      --transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    [data-theme="dark"] {
+      --bg: #09090b;
+      --surface: #121215;
+      --surface-subtle: #18181b;
+      --surface-border: #27272a;
+      --surface-border-strong: #3f3f46;
+      --text: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-subtle: #71717a;
+      --accent: #f4f4f5;
+      --accent-contrast: #09090b;
+      --tag-bg: #1c1c20;
+      --tag-border: #27272a;
+      --code-bg: #18181b;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100vh;
+      transition: background-color 0.25s ease, color 0.25s ease;
+      -webkit-font-smoothing: antialiased;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Header */
+    header {
+      padding: 48px 0 28px 0;
+      border-bottom: 1px solid var(--surface-border);
+      background-color: var(--surface);
+      margin-bottom: 32px;
+      transition: background-color 0.25s ease, border-color 0.25s ease;
+    }
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      gap: 16px;
+    }
+
+    .brand-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .brand-eyebrow::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--text);
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 680px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 8px 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      color: var(--text);
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .btn:hover {
+      background: var(--surface-subtle);
+      border-color: var(--surface-border-strong);
+    }
+
+    .theme-toggle {
+      width: 38px;
+      height: 38px;
+      padding: 0;
+    }
+
+    /* Tab Navigation */
+    .tabs-nav {
+      display: flex;
+      gap: 8px;
+      border-bottom: 1px solid var(--surface-border);
+      margin-bottom: 28px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: var(--transition);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text);
+    }
+
+    .tab-btn.active {
+      color: var(--text);
+      border-bottom-color: var(--text);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Cards & Sections */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface-subtle);
+      color: var(--text);
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    .badge-primary {
+      background: var(--accent);
+      color: var(--accent-contrast);
+      border-color: var(--accent);
+    }
+
+    /* Flow Steps */
+    .flow-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+
+    .flow-step {
+      display: flex;
+      gap: 16px;
+      position: relative;
+    }
+
+    .flow-step:not(:last-child)::before {
+      content: "";
+      position: absolute;
+      left: 17px;
+      top: 36px;
+      bottom: -16px;
+      width: 1px;
+      background: var(--surface-border-strong);
+    }
+
+    .flow-number {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border-strong);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+      color: var(--text);
+    }
+
+    .flow-content {
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 16px;
+      flex: 1;
+    }
+
+    .flow-title {
+      font-size: 14.5px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .flow-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--surface-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--text);
+      line-height: 1.6;
+      margin: 12px 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: var(--surface-subtle);
+      border: 1px solid var(--surface-border);
+      padding: 1px 6px;
+      border-radius: 4px;
+    }
+
+    pre code {
+      background: transparent;
+      border: none;
+      padding: 0;
+    }
+
+    /* Checklist */
+    .checklist {
+      list-style: none;
+    }
+
+    .check-item {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--surface-border);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: background 0.15s ease;
+    }
+
+    .check-item:last-child {
+      border-bottom: none;
+    }
+
+    .check-item:hover {
+      background: var(--surface-subtle);
+    }
+
+    .checkbox {
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border: 1.5px solid var(--surface-border-strong);
+      border-radius: 4px;
+      background: var(--surface);
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      margin-top: 2px;
+      flex-shrink: 0;
+      transition: var(--transition);
+    }
+
+    .checkbox:checked {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .checkbox:checked::before {
+      content: "";
+      width: 9px;
+      height: 5px;
+      border-left: 2px solid var(--accent-contrast);
+      border-bottom: 2px solid var(--accent-contrast);
+      transform: rotate(-45deg) translate(0.5px, -0.5px);
+    }
+
+    .check-label-wrap {
+      flex: 1;
+    }
+
+    .check-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .check-item.completed .check-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .check-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      margin-bottom: 24px;
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-track {
+      height: 8px;
+      background: var(--surface-subtle);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--surface-border);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--text);
+      width: 0%;
+      transition: width 0.35s ease;
+    }
+
+    /* Comparison Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 13.5px;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--surface-border);
+    }
+
+    th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--surface-subtle);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--accent);
+      color: var(--accent-contrast);
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow-md);
+      transform: translateY(80px);
+      opacity: 0;
+      transition: var(--transition);
+      z-index: 1000;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="header-top">
+        <div>
+          <div class="brand-eyebrow">Payment Engineering Spec</div>
+          <h1>LMS Stripe Integration Architecture</h1>
+          <p class="subtitle">Two-stage roadmap: Stage 1 delivers zero-friction local testing via Client Redirect Verification; Stage 2 provides production hardening via Webhooks.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn theme-toggle" id="themeToggleBtn" title="Toggle Theme">
+            <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="tabs-nav">
+        <button class="tab-btn active" data-tab="flow">Architecture & Flow</button>
+        <button class="tab-btn" data-tab="stage1">Stage 1: Local Setup</button>
+        <button class="tab-btn" data-tab="stage2">Stage 2: Production Webhooks</button>
+        <button class="tab-btn" data-tab="schema">Database Schema</button>
+        <button class="tab-btn" data-tab="checklist">Interactive Checklist</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- TAB 1: ARCHITECTURE & FLOW -->
+    <section class="tab-pane active" id="pane-flow">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Stage 1 Execution Flow (Zero External Tooling)</h2>
+          <span class="badge badge-primary">Client Redirect Verification</span>
+        </div>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+          This local architecture requires zero CLI daemons, no Ngrok tunnels, and no raw-body signature verification. Everything runs over standard authenticated REST requests.
+        </p>
+
+        <div class="flow-steps">
+          <div class="flow-step">
+            <div class="flow-number">01</div>
+            <div class="flow-content">
+              <div class="flow-title">Student clicks "Buy Course ($49)"</div>
+              <div class="flow-desc">Frontend calls <code>POST /payments/checkout/:courseId</code> with the student's session token.</div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">02</div>
+            <div class="flow-content">
+              <div class="flow-title">Backend initiates Stripe Checkout Session</div>
+              <div class="flow-desc">
+                Validates course is published, price &gt; 0, and user isn't already enrolled. Creates a <code>Payment</code> record in Postgres with <code>status: 'pending'</code>. Calls Stripe API and returns <code>checkoutUrl</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">03</div>
+            <div class="flow-content">
+              <div class="flow-title">Hosted Stripe Checkout &amp; Test Payment</div>
+              <div class="flow-desc">
+                Student is redirected to Stripe's secure page. They type test card <code>4242 4242 4242 4242</code> and complete checkout.
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">04</div>
+            <div class="flow-content">
+              <div class="flow-title">Stripe Redirects Back to Next.js Frontend</div>
+              <div class="flow-desc">
+                Browser lands on <code>http://localhost:3001/courses/:id?success=true&amp;session_id=cs_test_...</code>.
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">05</div>
+            <div class="flow-content">
+              <div class="flow-title">Immediate Verification &amp; Instant Enrollment</div>
+              <div class="flow-desc">
+                Frontend calls <code>POST /payments/verify-session { sessionId }</code>. Backend checks with Stripe: <code>session.payment_status === 'paid'</code>. In an atomic transaction, it updates the Payment to <code>completed</code> and creates the <code>Enrollment</code> record!
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom: 12px;">Stage 1 vs. Stage 2 Comparison</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Stage 1 (Local Setup)</th>
+              <th>Stage 2 (Production)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Verification Method</strong></td>
+              <td>Client Redirect (<code>/payments/verify-session</code>)</td>
+              <td>Hybrid: Client Redirect + Background Webhook</td>
+            </tr>
+            <tr>
+              <td><strong>External Tools Required</strong></td>
+              <td><strong>None</strong> (Zero CLI, no ngrok)</td>
+              <td>Stripe CLI or Public Domain for Webhooks</td>
+            </tr>
+            <tr>
+              <td><strong>Setup Time</strong></td>
+              <td>Instant (copy <code>sk_test_...</code>)</td>
+              <td>Requires Webhook Secret (<code>whsec_...</code>)</td>
+            </tr>
+            <tr>
+              <td><strong>Refund Handling</strong></td>
+              <td>Manual via Admin Dashboard</td>
+              <td>Automated via <code>charge.refunded</code> webhook</td>
+            </tr>
+            <tr>
+              <td><strong>Production Code Reuse</strong></td>
+              <td>100% reusable</td>
+              <td>Adds webhook endpoint without breaking Stage 1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- TAB 2: STAGE 1 LOCAL SETUP -->
+    <section class="tab-pane" id="pane-stage1">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Backend Code Architecture: Stage 1</h2>
+          <span class="badge">NestJS Implementation</span>
+        </div>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">1. Install Official Stripe SDK</h3>
+        <pre><code>pnpm --filter backend add stripe</code></pre>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">2. Environment Variables (.env)</h3>
+        <pre><code># Stripe Test Key (from dashboard.stripe.com)
+STRIPE_SECRET_KEY=sk_test_51...
+FRONTEND_URL=http://localhost:3001</code></pre>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">3. DTO: verify-session.dto.ts</h3>
+        <pre><code>import { IsNotEmpty, IsString } from 'class-validator';
+
+export class VerifySessionDto {
+  @IsString()
+  @IsNotEmpty()
+  sessionId: string;
+}</code></pre>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">4. Controller: payments.controller.ts</h3>
+        <pre><code>import { Controller, Post, Param, Body } from '@nestjs/common';
+import { PaymentsService } from './payments.service.js';
+import { VerifySessionDto } from './dto/verify-session.dto.js';
+import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+
+@Controller('payments')
+export class PaymentsController {
+  constructor(private readonly paymentsService: PaymentsService) {}
+
+  // 1. Create Checkout Session
+  @Post('checkout/:courseId')
+  createCheckout(
+    @Param('courseId') courseId: string,
+    @Session() session: UserSession,
+  ) {
+    return this.paymentsService.createCheckoutSession(courseId, session.user);
+  }
+
+  // 2. Client Redirect Verification (Works locally with zero CLI)
+  @Post('verify-session')
+  verifySession(
+    @Body() dto: VerifySessionDto,
+    @Session() session: UserSession,
+  ) {
+    return this.paymentsService.verifySession(dto.sessionId, session.user);
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- TAB 3: STAGE 2 PRODUCTION -->
+    <section class="tab-pane" id="pane-stage2">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Stage 2: Production Hardening (Webhooks)</h2>
+          <span class="badge">Future Production</span>
+        </div>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+          When preparing to go live, keep Stage 1 and attach the Webhook listener as an asynchronous safety net to handle closed tabs, network drops, and automated refunds.
+        </p>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Webhook Controller Endpoint</h3>
+        <pre><code>@Post('webhook')
+@AllowAnonymous()
+async handleWebhook(
+  @Headers('stripe-signature') signature: string,
+  @Req() req: RawBodyRequest&lt;Request&gt;,
+) {
+  const event = this.stripe.webhooks.constructEvent(
+    req.rawBody!, // Requires raw unparsed Buffer
+    signature,
+    this.config.get('STRIPE_WEBHOOK_SECRET')!,
+  );
+
+  if (event.type === 'checkout.session.completed') {
+    await this.paymentsService.fulfillOrder(event.data.object);
+  }
+
+  if (event.type === 'charge.refunded') {
+    await this.paymentsService.revokeEnrollment(event.data.object);
+  }
+
+  return { received: true };
+}</code></pre>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Going Live Checklist</h3>
+        <ul style="padding-left: 20px; font-size: 13.5px; color: var(--text-muted); line-height: 1.8;">
+          <li>Switch <code>STRIPE_SECRET_KEY</code> from <code>sk_test_...</code> to <code>sk_live_...</code></li>
+          <li>Paste the production Webhook Signing Secret into <code>STRIPE_WEBHOOK_SECRET</code></li>
+          <li>That's it — all business logic remains 100% identical!</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- TAB 4: DATABASE SCHEMA -->
+    <section class="tab-pane" id="pane-schema">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">schema.zmodel Definition</h2>
+          <span class="badge">ZenStack ORM</span>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px;">
+          Add this model to <code>packages/db/zenstack/schema.zmodel</code> right after <code>Enrollment</code>:
+        </p>
+
+        <pre><code>model Payment {
+    id                    String      @id @default(cuid())
+    
+    // Relations
+    userId                String      @default(auth().id)
+    user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    
+    courseId              String
+    course                Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+    
+    enrollmentId          String?     @unique
+    enrollment            Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+    // Financials
+    amount                Int         // stored in cents/paise
+    currency              String      @default("usd")
+    status                String      @default("pending") // 'pending' | 'completed' | 'failed'
+    
+    // Stripe data
+    provider              String      @default("stripe")
+    stripeSessionId       String?     @unique
+    stripePaymentIntentId String?     @unique
+    
+    createdAt             DateTime    @default(now())
+    updatedAt             DateTime    @updatedAt
+
+    // ZenStack Policies
+    @@allow('read', auth().id == userId || course.instructorId == auth().id || auth().role == 'admin')
+    @@allow('create', auth().id == userId || auth().role == 'admin')
+    @@allow('update', auth().id == userId || auth().role == 'admin')
+
+    @@map('payment')
+}</code></pre>
+
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Relation Updates:</h3>
+        <pre><code>// In model User:
+payments      Payment[]
+
+// In model Course:
+payments      Payment[]
+
+// In model Enrollment:
+payment       Payment?</code></pre>
+      </div>
+    </section>
+
+    <!-- TAB 5: CHECKLIST -->
+    <section class="tab-pane" id="pane-checklist">
+      <div class="progress-wrap">
+        <div class="progress-top">
+          <span>Implementation Progress</span>
+          <span id="progressText">0 / 6 Completed (0%)</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="progressFill"></div>
+        </div>
+      </div>
+
+      <div class="card" style="padding: 0;">
+        <ul class="checklist">
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t1" data-id="t1">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 1: Add Payment model to schema.zmodel</span>
+              <span class="check-desc">Add model Payment and update User, Course, Enrollment relations. Run <code>pnpm generate</code>.</span>
+            </div>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t2" data-id="t2">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 2: Install Stripe in Backend</span>
+              <span class="check-desc">Run <code>pnpm --filter backend add stripe</code> and add <code>STRIPE_SECRET_KEY</code> to <code>.env</code>.</span>
+            </div>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t3" data-id="t3">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 3: Scaffold PaymentsModule</span>
+              <span class="check-desc">Create <code>payments.module.ts</code> and register it in <code>AppModule</code>.</span>
+            </div>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t4" data-id="t4">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 4: Implement POST /payments/checkout/:courseId</span>
+              <span class="check-desc">Validates course, creates pending payment record, creates Stripe Checkout session, returns URL.</span>
+            </div>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t5" data-id="t5">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 5: Implement POST /payments/verify-session</span>
+              <span class="check-desc">Retrieves session from Stripe, checks payment_status === 'paid', atomically creates Enrollment.</span>
+            </div>
+          </li>
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t6" data-id="t6">
+            <div class="check-label-wrap">
+              <span class="check-title">Step 6: End-to-End Test Checkout</span>
+              <span class="check-desc">Test with Stripe test card <code>4242 4242 4242 4242</code> and confirm course lessons unlock.</span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="toast">Progress saved</div>
+
+  <script>
+    // Tab Switching
+    const tabButtons = document.querySelectorAll('.tab-btn');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabButtons.forEach(b => b.classList.remove('active'));
+        tabPanes.forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const tabId = btn.dataset.tab;
+        document.getElementById(`pane-${tabId}`).classList.add('active');
+      });
+    });
+
+    // Theme Toggle
+    const themeBtn = document.getElementById('themeToggleBtn');
+    const themeIcon = document.getElementById('themeIcon');
+
+    function initTheme() {
+      const saved = localStorage.getItem('lms_payment_theme') || 
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', saved);
+      updateIcon(saved);
+    }
+
+    function updateIcon(theme) {
+      if (theme === 'dark') {
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      }
+    }
+
+    themeBtn.addEventListener('click', () => {
+      const cur = document.documentElement.getAttribute('data-theme');
+      const next = cur === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('lms_payment_theme', next);
+      updateIcon(next);
+    });
+
+    // Checklist State with LocalStorage
+    const CHECK_KEY = 'lms_payment_checklist_state';
+    const checkboxes = document.querySelectorAll('.checkbox');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+    const toast = document.getElementById('toast');
+
+    function loadChecklist() {
+      try {
+        const data = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
+        checkboxes.forEach(cb => {
+          if (data[cb.dataset.id]) {
+            cb.checked = true;
+            cb.closest('.check-item').classList.add('completed');
+          }
+        });
+        updateProgress();
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function saveChecklist() {
+      const data = {};
+      checkboxes.forEach(cb => {
+        if (cb.checked) data[cb.dataset.id] = true;
+      });
+      localStorage.setItem(CHECK_KEY, JSON.stringify(data));
+      showToast('Progress updated');
+      updateProgress();
+    }
+
+    function updateProgress() {
+      const total = checkboxes.length;
+      const completed = document.querySelectorAll('.checkbox:checked').length;
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+      progressFill.style.width = `${percent}%`;
+      progressText.textContent = `${completed} / ${total} Completed (${percent}%)`;
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+
+    checkboxes.forEach(cb => {
+      cb.addEventListener('change', (e) => {
+        const item = e.target.closest('.check-item');
+        if (e.target.checked) {
+          item.classList.add('completed');
+        } else {
+          item.classList.remove('completed');
+        }
+        saveChecklist();
+      });
+    });
+
+    initTheme();
+    loadChecklist();
+  </script>
+</body>
+</html>

@@ -12,13 +12,25 @@ export class LessonsService {
 
   // create lesson for a course 
   async create(createLessonDto: CreateLessonDto, courseId: string, user: AuthUser) {
+
+    // auto calc position 
+    let position = createLessonDto.position
+    if (position === undefined || position === null) {
+      const lastLesson = await this.db.forUser(user).lesson.findFirst({
+        where: { courseId: courseId },
+        orderBy: { position: 'desc' },
+        select: { position: true },
+      })
+      position = (lastLesson?.position ?? 0) + 1
+    }
+    // lesson create 
     const lesson = await this.db.forUser(user).lesson.create({
       data: {
         title: createLessonDto.title,
         content: createLessonDto.content,
         videoUrl: createLessonDto.videoUrl,
         isFree: createLessonDto.isFree,
-        position: createLessonDto.position,
+        position: position,
         courseId: courseId,
       }
     })
@@ -33,7 +45,7 @@ export class LessonsService {
     const lesson = await this.db.forUser(user).lesson.findUnique({
       where: { id: id },
     })
-    if (!lesson.id) {
+    if (!lesson) {
       throw new NotFoundException("Unable to find the lesson");
     }
     return lesson;
@@ -49,14 +61,16 @@ export class LessonsService {
   }
 
   // reorder lessons of a course 
-  async reorder(courseId: string, reorderLessonDto: ReorderLessonDto, user: AuthUser) {
-    const lesson = await this.db.forUser(user).lesson.update({
-      where: { id: reorderLessonDto.lessonId },
-      data: {
-        position: reorderLessonDto.position,
-      },
-    })
-    return lesson;
+  async reorder(reorderLessonDto: ReorderLessonDto, user: AuthUser) {
+    return await this.db.forUser(user).$transaction(async (tx) => {
+      const updates = reorderLessonDto.lessonIds.map((lessonId, index) =>
+        tx.lesson.update({
+          where: { id: lessonId },
+          data: { position: index + 1 },
+        })
+      );
+      return await Promise.all(updates);
+    });
   }
 
   // delete a lesson 

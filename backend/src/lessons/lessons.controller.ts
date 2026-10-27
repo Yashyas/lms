@@ -28,9 +28,9 @@ export class LessonsController {
   }
 
   // reorder lession positions only instructor and admin can reorder lesson 
-  @Put('reorder/:courseId')
-  reorder(@Param('courseId') courseId: string, @Body() reorderLessonDto: ReorderLessonDto, @Session() session: UserSession) {
-    return this.lessonsService.reorder(courseId, reorderLessonDto, session.user);
+  @Put('reorder')
+  reorder(@Body() reorderLessonDto: ReorderLessonDto, @Session() session: UserSession) {
+    return this.lessonsService.reorder(reorderLessonDto, session.user);
   }
 
   // delete lesson only instructor and admin can delete lesson 

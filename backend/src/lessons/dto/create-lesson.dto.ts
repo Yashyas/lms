@@ -7,7 +7,6 @@ export class CreateLessonDto {
     title: string;
 
     @IsString()
-    @IsNotEmpty()
     @IsOptional()
     content?: string;
 

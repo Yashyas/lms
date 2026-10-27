@@ -131,7 +131,7 @@ model Enrollment {
     @@unique([userId, courseId])
     @@allow('read,create', auth().id == userId || auth().role == 'admin')
     @@allow('read', course.instructorId == auth().id)
-    @@allow('delete',auth().role == 'admin')
+    @@allow('delete', auth().id == userId || auth().role == 'admin')
     @@map('enrollment')
 
 }
