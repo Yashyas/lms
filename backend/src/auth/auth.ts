@@ -2,7 +2,7 @@ import { betterAuth } from 'better-auth';
 import { zenstackAdapter } from '@zenstackhq/better-auth';
 import { schema, ZenStackClient, PostgresDialect } from '@lms/db';
 import { Pool } from 'pg';
-import { admin, bearer } from 'better-auth/plugins';
+import { admin, bearer, openAPI } from 'better-auth/plugins';
 import { rawDbClient } from '../db-pool/db-pool.service.js';
 
 
@@ -37,21 +37,21 @@ export const auth = betterAuth({
         customRules: {
             "/sign-in/email": {
                 window: 60,
-                max: 5, // 5 login attempt per minute
+                max: 5,
             },
             "/sign-up/email": {
                 window: 60 * 60,
-                max: 5,  //3 signup per hour
+                max: 5,
             }
         },
     },
-    // any plugins you add in the future (e.g. organization, twoFactor, etc.)
     plugins: [
         bearer(),
         admin({
             defaultRole: 'student',
             adminRoles: ['admin'],
         }),
+        openAPI(),
     ],
     trustedOrigins: [
         process.env.FRONTEND_URL || "http://localhost:3001", 'http://localhost:3000',

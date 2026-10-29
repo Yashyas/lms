@@ -8,52 +8,67 @@ import { AllowAnonymous, Session, type UserSession } from '@thallesp/nestjs-bett
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) { }
 
-  // Get all courses for public 
+  /**
+   * Get all courses for public
+   */
   @Get()
   @AllowAnonymous()
   findAll() {
     return this.coursesService.findAll();
   }
 
-  // Get instructors courses 
+  /**
+   * Get instructors courses
+   */
   @Get('instructor/courses')
   findInstructorCourses(@Session() session: UserSession) {
     return this.coursesService.findInstructorCourses(session.user);
   }
 
-  // Get courses details by Slug for course detail page
+  /**
+   * Get course details by slug for course detail page
+   */
   @Get('slug/:slug')
   @AllowAnonymous()
   findBySlug(@Param('slug') slug: string) {
     return this.coursesService.findBySlug(slug);
   }
 
-
-  // create course only instructor and admin can create course 
+  /**
+   * Create course (instructor and admin only)
+   */
   @Post()
   create(@Session() session: UserSession, @Body() createCourseDto: CreateCourseDto) {
     return this.coursesService.create(createCourseDto, session.user);
   }
 
-  // get course by id 
+  /**
+   * Get course by id
+   */
   @Get(':id')
   findOne(@Param('id') id: string, @Session() session: UserSession) {
     return this.coursesService.findOne(id, session.user);
   }
 
-  // toggle publish status 
+  /**
+   * Toggle publish status
+   */
   @Patch('publish/:id')
   togglePublish(@Param('id') id: string, @Session() session: UserSession) {
     return this.coursesService.togglePublish(id, session.user);
   }
 
-  // update course only instructor and admin can update course
+  /**
+   * Update course (instructor and admin only)
+   */
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto, @Session() session: UserSession) {
     return this.coursesService.update(id, updateCourseDto, session.user);
   }
 
-  // delete course only instructor and admin can delete course
+  /**
+   * Delete course (instructor and admin only)
+   */
   @Delete(':id')
   remove(@Param('id') id: string, @Session() session: UserSession) {
     return this.coursesService.remove(id, session.user);
