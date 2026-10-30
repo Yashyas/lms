@@ -8,6 +8,8 @@ import { auth } from './auth/auth.js';
 import { CoursesModule } from './courses/courses.module.js';
 import { LessonsModule } from './lessons/lessons.module.js';
 import { EnrollmentModule } from './enrollment/enrollment.module.js';
+import { StorageModule } from './storage/storage.module.js';
+import { VideoAssetModule } from './video-asset/video-asset.module.js';
 
 @Module({
   imports: [
@@ -19,7 +21,9 @@ import { EnrollmentModule } from './enrollment/enrollment.module.js';
     AuthModule.forRoot({ auth }),
     CoursesModule,
     LessonsModule,
-    EnrollmentModule
+    EnrollmentModule,
+    StorageModule,
+    VideoAssetModule
   ],
   controllers: [AppController],
   providers: [AppService],

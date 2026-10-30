@@ -5,7 +5,7 @@
 
 /* eslint-disable */
 
-import { type SchemaType as $Schema } from "./schema.js";
+import { schema as $schema, type SchemaType as $Schema } from "./schema.js";
 import type { ModelResult as $ModelResult } from "@zenstackhq/orm";
 /**
  * User model
@@ -16,4 +16,7 @@ export type Account = $ModelResult<$Schema, "Account">;
 export type Verification = $ModelResult<$Schema, "Verification">;
 export type Course = $ModelResult<$Schema, "Course">;
 export type Lesson = $ModelResult<$Schema, "Lesson">;
+export type VideoAsset = $ModelResult<$Schema, "VideoAsset">;
 export type Enrollment = $ModelResult<$Schema, "Enrollment">;
+export const VideoStatus = $schema.enums.VideoStatus.values;
+export type VideoStatus = (typeof VideoStatus)[keyof typeof VideoStatus];

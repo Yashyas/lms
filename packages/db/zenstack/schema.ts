@@ -466,6 +466,12 @@ export class SchemaType implements SchemaDef {
                     type: "DateTime",
                     updatedAt: true,
                     attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                },
+                videoAsset: {
+                    name: "videoAsset",
+                    type: "VideoAsset",
+                    optional: true,
+                    relation: { opposite: "lesson" }
                 }
             },
             attributes: [
@@ -476,6 +482,91 @@ export class SchemaType implements SchemaDef {
             idFields: ["id"],
             uniqueFields: {
                 id: { type: "String" }
+            }
+        },
+        VideoAsset: {
+            name: "VideoAsset",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("cuid") as FieldDefault
+                },
+                status: {
+                    name: "status",
+                    type: "VideoStatus",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("PENDING_UPLOAD") }] }] as readonly AttributeApplication[],
+                    default: "PENDING_UPLOAD" as FieldDefault
+                },
+                lessonId: {
+                    name: "lessonId",
+                    type: "String",
+                    unique: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[],
+                    foreignKeyFor: [
+                        "lesson"
+                    ] as readonly string[]
+                },
+                lesson: {
+                    name: "lesson",
+                    type: "Lesson",
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("lessonId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("Cascade") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "videoAsset", fields: ["lessonId"], references: ["id"], onDelete: "Cascade" }
+                },
+                rawStorageKey: {
+                    name: "rawStorageKey",
+                    type: "String",
+                    optional: true
+                },
+                hlsMasterUrl: {
+                    name: "hlsMasterUrl",
+                    type: "String",
+                    optional: true
+                },
+                durationSeconds: {
+                    name: "durationSeconds",
+                    type: "Int",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(0) }] }] as readonly AttributeApplication[],
+                    default: 0 as FieldDefault
+                },
+                encryptionKey: {
+                    name: "encryptionKey",
+                    type: "String",
+                    optional: true
+                },
+                encryptionIv: {
+                    name: "encryptionIv",
+                    type: "String",
+                    optional: true
+                },
+                errorMessage: {
+                    name: "errorMessage",
+                    type: "String",
+                    optional: true
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["id"]), "==", ExpressionUtils.member(ExpressionUtils.field("lesson"), ["course", "instructorId"])), "||", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin"))) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("video_asset") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                lessonId: { type: "String" }
             }
         },
         Enrollment: {
@@ -534,6 +625,17 @@ export class SchemaType implements SchemaDef {
             uniqueFields: {
                 id: { type: "String" },
                 userId_courseId: { userId: { type: "String" }, courseId: { type: "String" } }
+            }
+        }
+    } as const;
+    enums = {
+        VideoStatus: {
+            name: "VideoStatus",
+            values: {
+                PENDING_UPLOAD: "PENDING_UPLOAD",
+                PROCESSING: "PROCESSING",
+                READY: "READY",
+                FAILED: "FAILED"
             }
         }
     } as const;

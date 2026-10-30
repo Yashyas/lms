@@ -113,11 +113,39 @@ model Lesson {
     course     Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt
+    videoAsset VideoAsset?
 
     @@allow('read', isFree || course.instructorId == auth().id || auth().role == 'admin' || course.enrollments?[userId == auth().id])
     @@allow('create,update,delete', course.instructorId == auth().id || auth().role == 'admin')
 
     @@map('lesson')
+}
+
+enum VideoStatus {
+    PENDING_UPLOAD
+    PROCESSING
+    READY
+    FAILED
+}
+
+model VideoAsset {
+    id                  String          @id @default(cuid())
+    status              VideoStatus     @default(PENDING_UPLOAD)
+    lessonId            String          @unique
+    lesson              Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+    rawStorageKey       String?
+    hlsMasterUrl        String?
+    durationSeconds     Int             @default(0)
+    encryptionKey       String?
+    encryptionIv        String?
+    errorMessage        String?
+    createdAt           DateTime        @default(now())
+    updatedAt           DateTime        @updatedAt
+
+    
+    @@allow('all', auth().id == lesson.course.instructorId || auth().role == 'admin')
+
+    @@map('video_asset')
 }
 
 model Enrollment {
