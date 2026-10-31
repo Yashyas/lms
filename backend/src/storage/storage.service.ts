@@ -30,6 +30,8 @@ export class StorageService {
         secretAccessKey,
       },
       forcePathStyle,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
     })
   }
 

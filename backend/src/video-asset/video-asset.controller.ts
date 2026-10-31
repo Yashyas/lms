@@ -1,34 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { VideoAssetService } from './video-asset.service.js';
-import { CreateVideoAssetDto } from './dto/create-video-asset.dto.js';
-import { UpdateVideoAssetDto } from './dto/update-video-asset.dto.js';
+import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { GetUploadVideoUrlDto } from './dto/create-video-asset.dto.js';
 
 @Controller('video-asset')
 export class VideoAssetController {
-  constructor(private readonly videoAssetService: VideoAssetService) {}
+  constructor(private readonly videoAssetService: VideoAssetService) { }
 
-  @Post()
-  create(@Body() createVideoAssetDto: CreateVideoAssetDto) {
-    return this.videoAssetService.create(createVideoAssetDto);
+  @Post('upload-url')
+  getUploadUrl(@Body() getUploadVideoUrlDto: GetUploadVideoUrlDto, @Session() session: UserSession) {
+    return this.videoAssetService.getUploadUrl(getUploadVideoUrlDto, session.user);
   }
 
-  @Get()
-  findAll() {
-    return this.videoAssetService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.videoAssetService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateVideoAssetDto: UpdateVideoAssetDto) {
-    return this.videoAssetService.update(+id, updateVideoAssetDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.videoAssetService.remove(+id);
+  @Patch(':lessonId/upload-complete')
+  markUpload(@Param('lessonId') lessonId: string, @Session() session: UserSession) {
+    return this.videoAssetService.markupUploadComplete(lessonId, session.user);
   }
 }
