@@ -4,12 +4,15 @@ import { AuthUser, DbPoolService } from '../db-pool/db-pool.service.js';
 import { GetUploadVideoUrlDto } from './dto/create-video-asset.dto.js';
 import { VideoStatus } from '@lms/db';
 import { StorageService } from '../storage/storage.service.js';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class VideoAssetService {
   constructor(
     private readonly db: DbPoolService,
     private readonly storageService: StorageService,
+    @InjectQueue('video-transcode') private readonly videoTranscodeQueue: Queue,
   ) { }
 
   async getUploadUrl(getUploadVideoUrlDto: GetUploadVideoUrlDto, user: AuthUser) {
@@ -58,6 +61,12 @@ export class VideoAssetService {
       data: {
         status: VideoStatus.PROCESSING
       }
+    })
+
+    await this.videoTranscodeQueue.add('transcode-job', {
+      videoAssetId: changedVideoAsset.id,
+      lessonId: changedVideoAsset.lessonId,
+      rawStorageKey: changedVideoAsset.rawStorageKey,
     })
 
     return changedVideoAsset;
