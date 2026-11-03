@@ -523,6 +523,20 @@
     
     <!-- TAB 1: ARCHITECTURE & FLOW -->
     <section class="tab-pane active" id="pane-flow">
+      <!-- Current Status Alert -->
+      <div class="card" style="border-left: 4px solid #16a34a; background: rgba(34, 197, 94, 0.04); margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <strong style="color: #16a34a; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Current State: Free Course Enrollment Live
+          </strong>
+          <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; border-color: rgba(34, 197, 94, 0.2);">ACTIVE IN BACKEND</span>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+          Free course enrollment (<code>price == 0</code>) is already fully implemented in <code>backend/src/enrollment/enrollment.service.ts</code> with duplicate enrollment prevention and instructor ownership checks. The Stripe workflow detailed below is required exclusively for paid courses (<code>price &gt; 0</code>).
+        </p>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">Stage 1 Execution Flow (Zero External Tooling)</h2>

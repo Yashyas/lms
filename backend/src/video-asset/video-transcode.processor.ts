@@ -5,6 +5,8 @@ import { Job } from "bullmq";
 import { pipeline } from "node:stream/promises";
 import fs, { createWriteStream } from "node:fs";
 import crypto from "node:crypto";
+import os from "node:os";
+import path from "node:path";
 import { promisify } from "node:util";
 import { exec } from "node:child_process";
 import { VideoStatus } from "@lms/db";
@@ -62,8 +64,9 @@ export class VideoTranscodeProcessor extends WorkerHost {
     // video processing job 
     async process(job: Job<{ videoAssetId: string; lessonId: string; rawStorageKey: string }>) {
         const { videoAssetId, lessonId, rawStorageKey } = job.data;
-        const workDir = `/tmp/transcode/${job.id}`;
-        const outputDir = `${workDir}/output`;
+        const cacheRoot = process.env.TRANSCODE_CACHE_DIR || path.join(os.homedir(), '.cache', 'lms-transcode');
+        const workDir = path.join(cacheRoot, String(job.id));
+        const outputDir = path.join(workDir, 'output');
         try {
             await fs.promises.mkdir(outputDir, { recursive: true });
 

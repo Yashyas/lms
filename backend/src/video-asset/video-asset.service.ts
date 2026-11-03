@@ -72,6 +72,40 @@ export class VideoAssetService {
     return changedVideoAsset;
   }
 
+  /**
+   * Secure AES-128 Key Delivery
+   * Validates student enrollment or free-preview status via ZenStack policy before returning raw 16-byte key buffer.
+   */
+  async getVideoKey(lessonId: string, user?: AuthUser | null): Promise<Buffer> {
+    // 1. Authorize access via ZenStack policy on Lesson
+    const lesson = await this.db.forUser(user).lesson.findUnique({
+      where: { id: lessonId },
+      select: { id: true, isFree: true, courseId: true },
+    });
+
+    if (!lesson) {
+      throw new ForbiddenException('You are not authorized to access this video key');
+    }
+
+    // 2. Fetch the AES-128 encryption key from the internal VideoAsset record
+    const videoAsset = await this.db.client.videoAsset.findUnique({
+      where: { lessonId },
+      select: { encryptionKey: true },
+    });
+
+    if (!videoAsset || !videoAsset.encryptionKey) {
+      throw new NotFoundException('Decryption key not found for this lesson');
+    }
+
+    // 3. Convert 32-character hex key to raw 16-byte binary buffer
+    const keyBuffer = Buffer.from(videoAsset.encryptionKey, 'hex');
+    if (keyBuffer.length !== 16) {
+      throw new InternalServerErrorException('Corrupted encryption key');
+    }
+
+    return keyBuffer;
+  }
+
   remove(id: number) {
     return `This action removes a #${id} videoAsset`;
   }
