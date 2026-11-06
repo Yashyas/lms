@@ -11,6 +11,7 @@ import { EnrollmentModule } from './enrollment/enrollment.module.js';
 import { StorageModule } from './storage/storage.module.js';
 import { VideoAssetModule } from './video-asset/video-asset.module.js';
 import { BullModule } from '@nestjs/bullmq'
+import { LessonProgressModule } from './lesson-progress/lesson-progress.module.js';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { BullModule } from '@nestjs/bullmq'
         },
       }),
     }),
+    LessonProgressModule,
   ],
   controllers: [AppController],
   providers: [AppService],

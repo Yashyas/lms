@@ -30,7 +30,7 @@ export const auth = betterAuth({
     },
 
     rateLimit: {
-        enabled: true,
+        enabled: process.env.DISABLE_AUTH_RATE_LIMIT === 'true' ? false : true,
         window: 60,
         max: 100,
 
