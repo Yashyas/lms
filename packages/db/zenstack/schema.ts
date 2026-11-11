@@ -349,6 +349,11 @@ export class SchemaType implements SchemaDef {
                     type: "String",
                     optional: true
                 },
+                thumbnail: {
+                    name: "thumbnail",
+                    type: "String",
+                    optional: true
+                },
                 price: {
                     name: "price",
                     type: "Int",

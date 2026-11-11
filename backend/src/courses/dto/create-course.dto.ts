@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsOptional, IsString, MinLength, IsInt, Min, MaxLength, IsBoolean } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, MinLength, IsInt, Min, MaxLength, IsBoolean, IsUrl } from 'class-validator';
 export class CreateCourseDto {
     @IsString()
     @IsNotEmpty()
@@ -13,6 +13,10 @@ export class CreateCourseDto {
     @IsString()
     @IsOptional()
     description?: string;
+
+    @IsString()
+    @IsOptional()
+    thumbnail?: string;
 
     @IsInt()
     @Min(0)

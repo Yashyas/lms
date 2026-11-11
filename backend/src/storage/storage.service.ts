@@ -113,4 +113,32 @@ export class StorageService {
     }
     while (continuationToken)
   }
+
+  // get permanent public url for thumbnail or any static asset 400 
+  getPublicUrl(key: string): string {
+    // convert s3 url to public url 
+    const endpoint = process.env.S3_ENDPOINT
+    return `${endpoint}/${this.bucketName}/${key}`
+  }
+
+  // used for deleting thumbnail when updating 
+  async deleteFile(key: string) {
+    try {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      })
+      await this.s3Client.send(command)
+    } catch (error) {
+      throw new InternalServerErrorException('Error deleting file')
+    }
+  }
+  // Extract key from public url 
+  getKeyFromUrl(url: string): string | null {
+    if (!url || !url.includes(this.bucketName)) return null;
+    // Extracts: "thumbnails/courses/cmvs1.../xyz.png"
+    const parts = url.split(`${this.bucketName}/`);
+    return parts.length > 1 ? parts[1].split('?')[0] : null;
+  }
+
 }

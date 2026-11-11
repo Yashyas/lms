@@ -3,11 +3,14 @@ import { CreateCourseDto } from './dto/create-course.dto.js';
 import { UpdateCourseDto } from './dto/update-course.dto.js';
 // import { UserSession } from '@thallesp/nestjs-better-auth';
 import { AuthUser, DbPoolService } from '../db-pool/db-pool.service.js';
+import { StorageService } from '../storage/storage.service.js';
+import { GetThumbnailUploadDto } from './dto/thumbnail-upload.dto.js';
 
 @Injectable()
 export class CoursesService {
   constructor(
-    private readonly db: DbPoolService
+    private readonly db: DbPoolService,
+    private readonly storageService: StorageService,
   ) { }
 
   // create course 
@@ -25,6 +28,7 @@ export class CoursesService {
       data: {
         title: createCourseDto.title,
         description: createCourseDto.description,
+        thumbnail: createCourseDto.thumbnail,
         price: createCourseDto.price,
         instructorId: user.id,
         slug: slug,
@@ -34,6 +38,40 @@ export class CoursesService {
       throw new InternalServerErrorException("Unable to create the course")
     }
     return course
+  }
+
+  async getThumbnailUploadUrl(courseId: string, thumbnailUploadDto: GetThumbnailUploadDto, user: AuthUser) {
+    // check if course exists for this instructor
+    const course = await this.db.forUser(user).course.findUnique({
+      where: { id: courseId },
+      select: { id: true, instructorId: true },
+    });
+
+    if (!course) {
+      throw new NotFoundException('Course not found or you are not authorized');
+    }
+
+    // check if user is instructor or admin 
+    if (course.instructorId !== user.id && user.role !== 'admin') {
+      throw new ForbiddenException('You are not authorized to upload thumbnail for this course');
+    }
+
+    // generate unique S3 key
+    const extension = thumbnailUploadDto.fileName.split('.').pop() || 'webp';
+    const cleanExtension = extension.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const key = `thumbnails/courses/${course.id}/${crypto.randomUUID()}.${cleanExtension}`;
+
+    // generate presigned PUT URL (valid for 15 mins)
+    const uploadUrl = await this.storageService.getUploadPresignedUrl(key, thumbnailUploadDto.contentType, 900);
+
+    // construct public url
+    const publicUrl = this.storageService.getPublicUrl(key);
+
+    return {
+      uploadUrl,
+      publicUrl,
+      key,
+    };
   }
 
   // get all published courses -- no need for pagination as the course will not exceed more than 20-30, will do search on frontend
@@ -112,11 +150,26 @@ export class CoursesService {
 
   // update a course 
   async update(id: string, updateCourseDto: UpdateCourseDto, user: AuthUser) {
-    const course = await this.db.forUser(user).course.update({
-      where: { id: id },
+    // when updating thumbnail, fetch the existing one to delete it
+
+    if (updateCourseDto.thumbnail) {
+      const existing = await this.db.forUser(user).course.findUnique({
+        where: { id },
+        select: { thumbnail: true },
+      });
+      if (existing?.thumbnail && existing.thumbnail !== updateCourseDto.thumbnail) {
+        const oldKey = this.storageService.getKeyFromUrl(existing.thumbnail);
+        if (oldKey) {
+          await this.storageService.deleteFile(oldKey);
+        }
+      }
+    }
+
+    // update course
+    return await this.db.forUser(user).course.update({
+      where: { id },
       data: updateCourseDto,
-    })
-    return course
+    });
   }
 
   // toggle publish status of course 
@@ -147,10 +200,18 @@ export class CoursesService {
   async remove(id: string, user: AuthUser) {
     const course = await this.db.forUser(user).course.findUnique({
       where: { id: id },
+      select: { id: true, thumbnail: true },
     })
     if (!course) {
       throw new NotFoundException("course not found")
     }
+
+    // Delete thumbnail from S3
+    if (course.thumbnail) {
+      const key = this.storageService.getKeyFromUrl(course.thumbnail);
+      if (key) await this.storageService.deleteFile(key);
+    }
+
     const deletedCourse = await this.db.forUser(user).course.delete({
       where: { id: id },
     })
