@@ -18,5 +18,6 @@ export type Course = $ModelResult<$Schema, "Course">;
 export type Lesson = $ModelResult<$Schema, "Lesson">;
 export type VideoAsset = $ModelResult<$Schema, "VideoAsset">;
 export type Enrollment = $ModelResult<$Schema, "Enrollment">;
+export type LessonProgress = $ModelResult<$Schema, "LessonProgress">;
 export const VideoStatus = $schema.enums.VideoStatus.values;
 export type VideoStatus = (typeof VideoStatus)[keyof typeof VideoStatus];

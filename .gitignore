@@ -1,10 +1,18 @@
 node_modules
 .pnpm-debug.log*
+*.log
 .DS_Store
+Thumbs.db
 dist
 .next
+.turbo
+*.tsbuildinfo
+coverage
 .env
 .env.*
 !.env.example
 .venv/
 graphify-out
+
+# Load test scripts and benchmark data
+load-test/

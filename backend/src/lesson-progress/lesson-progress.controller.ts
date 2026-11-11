@@ -1,34 +1,30 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { LessonProgressService } from './lesson-progress.service.js';
-import { CreateLessonProgressDto } from './dto/create-lesson-progress.dto.js';
-import { UpdateLessonProgressDto } from './dto/update-lesson-progress.dto.js';
+import { RecordHeartbeatDto } from './dto/record-heartbeat.dto.js';
+import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+
 
 @Controller('lesson-progress')
 export class LessonProgressController {
-  constructor(private readonly lessonProgressService: LessonProgressService) {}
+  constructor(private readonly lessonProgressService: LessonProgressService) { }
 
-  @Post()
-  create(@Body() createLessonProgressDto: CreateLessonProgressDto) {
-    return this.lessonProgressService.create(createLessonProgressDto);
+  @Post('heartbeat/:lessonId')
+  recordHeartbeat(@Body() recordHeartbeatDto: RecordHeartbeatDto, @Param('lessonId') lessonId: string, @Session() session: UserSession) {
+    return this.lessonProgressService.recordHeartbeat(recordHeartbeatDto, session.user, lessonId);
   }
 
-  @Get()
-  findAll() {
-    return this.lessonProgressService.findAll();
+  @Get(':lessonId')
+  findOne(@Param('lessonId') lessonId: string, @Session() session: UserSession) {
+    return this.lessonProgressService.getLessonProgress(lessonId, session.user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.lessonProgressService.findOne(+id);
+  @Patch(':lessonId/complete')
+  update(@Param('lessonId') lessonId: string, @Session() session: UserSession) {
+    return this.lessonProgressService.toggleLessonComplete(lessonId, session.user);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLessonProgressDto: UpdateLessonProgressDto) {
-    return this.lessonProgressService.update(+id, updateLessonProgressDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.lessonProgressService.remove(+id);
+  @Get('course/:courseId/progress')
+  getCourseProgress(@Param('courseId') courseId: string, @Session() session: UserSession) {
+    return this.lessonProgressService.getCourseProgress(courseId, session.user);
   }
 }

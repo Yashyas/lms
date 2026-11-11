@@ -26,6 +26,7 @@ model User {
 
     coursesTaught Course[]  @relation("InstructorCourses")
     enrollments   Enrollment[]
+    lessonProgress LessonProgress[]
 
     @@allow('read',true)
     @@allow('update', auth().id == id || auth().role == 'admin')
@@ -47,6 +48,7 @@ model Session {
     impersonatedBy String?
 
     @@allow('all',auth().id == userId || auth().role == 'admin')
+    @@index([userId])
     @@map('session')
 }
 
@@ -67,6 +69,7 @@ model Account {
     updatedAt             DateTime  @updatedAt
 
     @@allow('all', auth().id == userId || auth().role == 'admin')
+    @@index([userId])
     @@map('account')
 }
 
@@ -99,6 +102,8 @@ model Course {
     @@allow('create', auth().role == 'instructor' || auth().role == 'admin')
     @@allow('update,delete', auth().id == instructorId || auth().role == 'admin')
     
+    @@index([published])
+    @@index([instructorId])
     @@map('course')
 }
 
@@ -114,10 +119,13 @@ model Lesson {
     createdAt  DateTime   @default(now())
     updatedAt  DateTime   @updatedAt
     videoAsset VideoAsset?
+    lessonProgress LessonProgress[]
 
     @@allow('read', isFree || course.instructorId == auth().id || auth().role == 'admin' || course.enrollments?[userId == auth().id])
     @@allow('create,update,delete', course.instructorId == auth().id || auth().role == 'admin')
 
+    @@index([courseId])
+    @@index([courseId, position])
     @@map('lesson')
 }
 
@@ -157,9 +165,31 @@ model Enrollment {
     createdAt   DateTime    @default(now())
 
     @@unique([userId, courseId])
+    @@index([courseId])
+    @@index([userId, createdAt])
     @@allow('read,create', auth().id == userId || auth().role == 'admin')
     @@allow('read', course.instructorId == auth().id)
     @@allow('delete', auth().id == userId || auth().role == 'admin')
     @@map('enrollment')
 
+}
+
+model LessonProgress {
+    id                  String      @id @default(cuid())
+    userId              String      @default(auth().id)
+    user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    lessonId            String
+    lesson              Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+    lastPlayedSeconds   Int         @default(0)
+    completed           Boolean     @default(false)
+    completedAt         DateTime?   
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
+
+    @@allow('read,create,update', auth().id == userId || auth().role == 'admin')
+    @@allow('read', lesson.course.instructorId == auth().id)
+
+
+    @@unique([userId, lessonId])
+    @@map('lesson_progress')
 }
