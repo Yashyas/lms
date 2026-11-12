@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 import { auth } from './auth/auth.js';
+import { ValidationPipe } from '@nestjs/common';
+import { GlobalExceptionFilter } from './filters/global-exception.filter.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -16,6 +18,17 @@ async function bootstrap() {
     credentials: true,
   });
 
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+    transform: true,
+    forbidNonWhitelisted: true,
+    transformOptions: { enableImplicitConversion: true },
+  }));
+
+  // zenstack error exception filter 
+  app.useGlobalFilters(new GlobalExceptionFilter());
+
+  // swagger setup for the api documentation
   const config = new DocumentBuilder()
     .setTitle('LMS API')
     .setVersion('1.0')
