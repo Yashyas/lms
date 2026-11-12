@@ -42,6 +42,10 @@ async function bootstrap() {
     '/sign-up/email',
     '/sign-out',
     '/get-session',
+    '/change-password',
+    '/forget-password',
+    '/reset-password',
+    '/change-email',
     '/admin/set-role',
     '/admin/list-users',
   ]);

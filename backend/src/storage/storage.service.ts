@@ -1,5 +1,5 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, ListObjectsV2Command, PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { DeleteObjectCommand, DeleteObjectsCommand, GetObjectCommand, HeadObjectCommand, ListObjectsV2Command, PutObjectCommand, PutObjectCommandInput, S3Client } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 import { Readable } from 'node:stream';
 
@@ -36,14 +36,20 @@ export class StorageService {
   }
 
   // functions here 
-  async getUploadPresignedUrl(key: string, contentType: string, expiresIn = 900): Promise<string> {
+  async getUploadPresignedUrl(
+    key: string,
+    contentType: string,
+    expiresIn = 900,
+    contentLength?: number,
+  ): Promise<string> {
     const command = new PutObjectCommand({
       Bucket: this.bucketName,
       Key: key,
       ContentType: contentType,
-    })
+      ...(contentLength ? { ContentLength: contentLength } : {}),
+    });
 
-    return await getSignedUrl(this.s3Client, command, { expiresIn })
+    return await getSignedUrl(this.s3Client, command, { expiresIn });
   }
 
   // download raw video stream 
@@ -121,8 +127,11 @@ export class StorageService {
     return `${endpoint}/${this.bucketName}/${key}`
   }
 
-  // used for deleting thumbnail when updating 
+  // used for deleting thumbnail/avatar when updating 
   async deleteFile(key: string) {
+    if (!key || key.includes('..') || (!key.startsWith('thumbnails/') && !key.startsWith('avatars/'))) {
+      throw new InternalServerErrorException('Dangerous or unauthorized file deletion key');
+    }
     try {
       const command = new DeleteObjectCommand({
         Bucket: this.bucketName,
@@ -139,6 +148,48 @@ export class StorageService {
     // Extracts: "thumbnails/courses/cmvs1.../xyz.png"
     const parts = url.split(`${this.bucketName}/`);
     return parts.length > 1 ? parts[1].split('?')[0] : null;
+  }
+
+  /**
+   * Authoritatively verifies an uploaded file in S3 against size and MIME constraints.
+   * Prevents oversized, malicious, or non-existent files from being attached.
+   */
+  async verifyUploadedObject(
+    key: string,
+    maxBytes: number,
+    allowedMimes: string[],
+  ): Promise<{ size: number; contentType: string }> {
+    try {
+      const command = new HeadObjectCommand({
+        Bucket: this.bucketName,
+        Key: key,
+      });
+      const res = await this.s3Client.send(command);
+
+      const size = res.ContentLength ?? 0;
+      const contentType = res.ContentType ?? '';
+
+      if (size === 0 || size > maxBytes) {
+        await this.deleteFile(key).catch(() => {});
+        throw new BadRequestException(
+          `Uploaded file size (${Math.round(size / 1024)} KB) exceeds the maximum allowed limit of ${Math.round(maxBytes / (1024 * 1024))} MB`,
+        );
+      }
+
+      if (!allowedMimes.includes(contentType)) {
+        await this.deleteFile(key).catch(() => {});
+        throw new BadRequestException(
+          `Uploaded file MIME type "${contentType}" is not permitted`,
+        );
+      }
+
+      return { size, contentType };
+    } catch (err) {
+      if (err instanceof BadRequestException) throw err;
+      throw new NotFoundException(
+        'Uploaded image file not found in storage. Please upload the file first before saving.',
+      );
+    }
   }
 
 }

@@ -34,8 +34,20 @@ export class SchemaType implements SchemaDef {
                 emailVerified: {
                     name: "emailVerified",
                     type: "Boolean",
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }, { name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[],
                     default: false as FieldDefault
+                },
+                headline: {
+                    name: "headline",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(256) }] }] as readonly AttributeApplication[]
+                },
+                bio: {
+                    name: "bio",
+                    type: "String",
+                    optional: true,
+                    attributes: [{ name: "@length", args: [{ name: "min", value: ExpressionUtils.literal(0) }, { name: "max", value: ExpressionUtils.literal(2048) }] }] as readonly AttributeApplication[]
                 },
                 image: {
                     name: "image",
@@ -70,24 +82,27 @@ export class SchemaType implements SchemaDef {
                 role: {
                     name: "role",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[]
                 },
                 banned: {
                     name: "banned",
                     type: "Boolean",
                     optional: true,
-                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }] as readonly AttributeApplication[],
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal(false) }] }, { name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[],
                     default: false as FieldDefault
                 },
                 banReason: {
                     name: "banReason",
                     type: "String",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[]
                 },
                 banExpires: {
                     name: "banExpires",
                     type: "DateTime",
-                    optional: true
+                    optional: true,
+                    attributes: [{ name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[]
                 },
                 coursesTaught: {
                     name: "coursesTaught",

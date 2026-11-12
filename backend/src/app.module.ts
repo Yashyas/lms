@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,6 +13,8 @@ import { StorageModule } from './storage/storage.module.js';
 import { VideoAssetModule } from './video-asset/video-asset.module.js';
 import { BullModule } from '@nestjs/bullmq'
 import { LessonProgressModule } from './lesson-progress/lesson-progress.module.js';
+import { UsersModule } from './users/users.module.js';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -21,6 +24,10 @@ import { LessonProgressModule } from './lesson-progress/lesson-progress.module.j
     }),
     DbPoolModule,
     AuthModule.forRoot({ auth }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 100,
+    }]),
     CoursesModule,
     LessonsModule,
     EnrollmentModule,
@@ -36,8 +43,15 @@ import { LessonProgressModule } from './lesson-progress/lesson-progress.module.j
       }),
     }),
     LessonProgressModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule { }

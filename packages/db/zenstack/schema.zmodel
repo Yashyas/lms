@@ -13,16 +13,18 @@ model User {
     id            String    @id @default(cuid())
     email         String    @unique @email @length(6, 255)
     name          String
-    emailVerified Boolean   @default(false)
+    emailVerified Boolean   @default(false) @allow('update', auth().role == 'admin')
+    headline      String?   @length(0, 256)
+    bio           String?   @length(0, 2048)
     image         String?
     createdAt     DateTime  @default(now())
     updatedAt     DateTime  @default(now()) @updatedAt
     sessions      Session[]
     accounts      Account[]
-    role          String?
-    banned        Boolean?  @default(false)
-    banReason     String?
-    banExpires    DateTime?
+    role          String?   @allow('update', auth().role == 'admin')
+    banned        Boolean?  @default(false) @allow('update', auth().role == 'admin')
+    banReason     String?   @allow('update', auth().role == 'admin')
+    banExpires    DateTime? @allow('update', auth().role == 'admin')
 
     coursesTaught Course[]  @relation("InstructorCourses")
     enrollments   Enrollment[]
