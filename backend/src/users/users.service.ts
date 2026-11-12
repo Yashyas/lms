@@ -56,57 +56,48 @@ export class UsersService {
   async updateMe(dto: UpdateUserProfileDto, user: AuthUser) {
     const userAvatarPrefix = `avatars/${user.id}/`;
 
-    // 1. If updating image, validate ownership, verify uploaded object in S3, and clean up previous S3 avatar
-    if (dto.image !== undefined) {
-      let newKey: string | null = null;
-      if (dto.image) {
-        newKey = this.storageService.getKeyFromUrl(dto.image);
-        // Security check: Must belong strictly to this user's avatar path in S3
-        if (!newKey || !newKey.startsWith(userAvatarPrefix)) {
-          throw new ForbiddenException(
-            'Avatar image must be uploaded through the avatar upload endpoint',
-          );
-        }
-      }
-
-      const existing = await this.db.forUser(user).user.findUnique({
-        where: { id: user.id },
-        select: { image: true },
-      });
-
-      // If attaching a new image, authoritatively verify its presence and size in S3
-      if (newKey && existing?.image !== dto.image) {
-        await this.storageService.verifyUploadedObject(newKey, 5 * 1024 * 1024, [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-        ]);
-      }
-
-      // Security check: Only delete old image if it strictly belongs to this user's avatar path
-      if (existing?.image && existing.image !== dto.image) {
-        const oldKey = this.storageService.getKeyFromUrl(existing.image);
-        if (oldKey && oldKey.startsWith(userAvatarPrefix)) {
-          await this.storageService.deleteFile(oldKey);
-        }
-      }
-    }
-
-    // 2. Strict field whitelist for security
     const updateData: {
       name?: string;
       headline?: string;
       bio?: string;
-      image?: string;
-    } = {};
+      image?: string | null;
+    } = {
+      ...(dto.name !== undefined && { name: dto.name }),
+      ...(dto.headline !== undefined && { headline: dto.headline }),
+      ...(dto.bio !== undefined && { bio: dto.bio }),
+    };
 
-    if (dto.name !== undefined) updateData.name = dto.name;
-    if (dto.headline !== undefined) updateData.headline = dto.headline;
-    if (dto.bio !== undefined) updateData.bio = dto.bio;
-    if (dto.image !== undefined) updateData.image = dto.image;
+    let existingImage: string | null | undefined;
 
-    // 3. Update user profile via ZenStack policy client
-    return await this.db.forUser(user).user.update({
+    if (dto.image !== undefined) {
+      const existing = await this.db.forUser(user).user.findUnique({
+        where: { id: user.id },
+        select: { image: true },
+      });
+      existingImage = existing?.image;
+
+      if (dto.image !== existingImage) {
+        if (dto.image) {
+          const newKey = this.storageService.getKeyFromUrl(dto.image);
+          if (!newKey || !newKey.startsWith(userAvatarPrefix) || newKey.includes('..')) {
+            throw new ForbiddenException(
+              'Avatar image must be uploaded through the avatar upload endpoint',
+            );
+          }
+
+          await this.storageService.verifyUploadedObject(newKey, 5 * 1024 * 1024, [
+            'image/jpeg',
+            'image/png',
+            'image/webp',
+          ]);
+          updateData.image = this.storageService.getPublicUrl(newKey);
+        } else {
+          updateData.image = null;
+        }
+      }
+    }
+
+    const updated = await this.db.forUser(user).user.update({
       where: { id: user.id },
       data: updateData,
       select: {
@@ -120,6 +111,15 @@ export class UsersService {
         updatedAt: true,
       },
     });
+
+    if (dto.image !== undefined && existingImage && existingImage !== updated.image) {
+      const oldKey = this.storageService.getKeyFromUrl(existingImage);
+      if (oldKey && oldKey.startsWith(userAvatarPrefix) && !oldKey.includes('..')) {
+        await this.storageService.deleteFile(oldKey).catch(() => {});
+      }
+    }
+
+    return updated;
   }
 
   /**
@@ -193,8 +193,11 @@ export class UsersService {
       throw new NotFoundException('Instructor not found');
     }
 
-    const { banned, ...publicData } = instructor;
-    return publicData;
+    const { banned, role, ...publicData } = instructor;
+    return {
+      ...publicData,
+      role: 'instructor',
+    };
   }
 
   /**
@@ -203,7 +206,10 @@ export class UsersService {
    */
   async assignInstructorByEmail(dto: AssignInstructorDto, adminUser: AuthUser) {
     // 1. Strict Authorization check: only admin can promote users
-    if (adminUser.role !== 'admin') {
+    const isAdmin = Array.isArray(adminUser.role)
+      ? adminUser.role.includes('admin')
+      : adminUser.role === 'admin';
+    if (!isAdmin) {
       throw new ForbiddenException('Only platform administrators can assign instructor roles');
     }
 

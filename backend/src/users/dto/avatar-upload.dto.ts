@@ -1,11 +1,11 @@
-import { IsNotEmpty, IsNumber, IsString, Matches, Max, Min } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsNotEmpty, IsNumber, IsOptional, IsString, Matches, Max, Min } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class GetAvatarUploadUrlDto {
-  @ApiProperty({ example: 'profile.png', description: 'Original file name' })
+  @ApiPropertyOptional({ example: 'profile.png', description: 'Original file name' })
   @IsString()
-  @IsNotEmpty()
-  fileName: string;
+  @IsOptional()
+  fileName?: string;
 
   @ApiProperty({
     example: 'image/webp',
