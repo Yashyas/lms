@@ -14,6 +14,7 @@ import { VideoAssetModule } from './video-asset/video-asset.module.js';
 import { BullModule } from '@nestjs/bullmq'
 import { LessonProgressModule } from './lesson-progress/lesson-progress.module.js';
 import { UsersModule } from './users/users.module.js';
+import { AdminModule } from './admin/admin.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
@@ -44,6 +45,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     }),
     LessonProgressModule,
     UsersModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [

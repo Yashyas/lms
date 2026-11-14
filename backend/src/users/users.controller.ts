@@ -6,7 +6,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { AllowAnonymous, Session, type UserSession } from '@thallesp/nestjs-better-auth';
+import { AllowAnonymous, Roles, Session, type UserSession } from '@thallesp/nestjs-better-auth';
 import { Throttle } from '@nestjs/throttler';
 import { UsersService } from './users.service.js';
 import { UpdateUserProfileDto } from './dto/update-user-profile.dto.js';
@@ -15,7 +15,7 @@ import { AssignInstructorDto } from './dto/assign-instructor.dto.js';
 
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly usersService: UsersService) { }
 
   /**
    * Get current logged-in user profile and stats
@@ -28,6 +28,7 @@ export class UsersController {
   /**
    * Update profile (name, headline, bio, avatar)
    */
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Patch('me')
   updateMe(
     @Body() dto: UpdateUserProfileDto,
@@ -39,7 +40,7 @@ export class UsersController {
   /**
    * Generate presigned S3 upload URL for avatar image (Max 10 per min)
    */
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('avatar-upload-url')
   getAvatarUploadUrl(
     @Body() dto: GetAvatarUploadUrlDto,
@@ -51,7 +52,8 @@ export class UsersController {
   /**
    * Assign instructor role to a user by email (Admin only, Max 10 per min)
    */
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
+  @Roles(['admin'])
   @Post('admin/assign-instructor')
   assignInstructor(
     @Body() dto: AssignInstructorDto,

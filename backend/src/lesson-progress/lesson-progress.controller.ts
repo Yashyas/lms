@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param } from '@nestjs/common';
 import { LessonProgressService } from './lesson-progress.service.js';
 import { RecordHeartbeatDto } from './dto/record-heartbeat.dto.js';
 import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
