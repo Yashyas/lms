@@ -66,6 +66,10 @@ export class DbPoolService implements OnModuleInit, OnModuleDestroy {
     return this.client.enrollment;
   }
 
+  get payment() {
+    return this.client.payment;
+  }
+
   async onModuleDestroy() {
     await this.client?.$disconnect();
     await this.pool?.end();

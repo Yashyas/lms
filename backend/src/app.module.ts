@@ -16,6 +16,7 @@ import { LessonProgressModule } from './lesson-progress/lesson-progress.module.j
 import { UsersModule } from './users/users.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { PaymentsModule } from './payments/payments.module.js';
 
 @Module({
   imports: [
@@ -46,6 +47,7 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     LessonProgressModule,
     UsersModule,
     AdminModule,
+    PaymentsModule,
   ],
   controllers: [AppController],
   providers: [
