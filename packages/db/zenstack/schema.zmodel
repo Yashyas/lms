@@ -26,6 +26,7 @@ model User {
     banReason     String?   @allow('update', auth().role == 'admin')
     banExpires    DateTime? @allow('update', auth().role == 'admin')
 
+    payments      Payment[]
     coursesTaught Course[]  @relation("InstructorCourses")
     enrollments   Enrollment[]
     lessonProgress LessonProgress[]
@@ -98,6 +99,7 @@ model Course {
     instructor   User       @relation("InstructorCourses", fields: [instructorId], references: [id], onDelete: Cascade)
     lessons      Lesson[]
     enrollments  Enrollment[]
+    payments     Payment[]
     createdAt    DateTime   @default(now())
     updatedAt    DateTime   @updatedAt
 
@@ -167,6 +169,8 @@ model Enrollment {
     course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
     createdAt   DateTime    @default(now())
 
+    payment     Payment?
+
     @@unique([userId, courseId])
     @@index([courseId])
     @@index([userId, createdAt])
@@ -195,4 +199,46 @@ model LessonProgress {
 
     @@unique([userId, lessonId])
     @@map('lesson_progress')
+}
+
+enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+}
+
+model Payment {
+    id                    String          @id @default(cuid())
+    userId                String?         
+    user                  User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+    
+    courseId              String?
+    course                Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
+    
+    enrollmentId          String?         @unique
+    enrollment            Enrollment?     @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+
+    userEmail             String          //email of user buying course
+    courseTitle           String          //title at the time of buying course
+
+
+    price                 Int             // stored in cents/paise
+    currency              String          @default("usd")
+    status                PaymentStatus   @default(PENDING)
+    provider              String          @default("stripe")
+    stripeSessionId       String?         @unique
+    stripePaymentIntentId String?         @unique
+   
+    createdAt             DateTime        @default(now())
+    updatedAt             DateTime        @updatedAt
+   
+    @@allow('read', (userId != null && auth().id == userId) || (course != null && course.instructorId == auth().id) || auth().role == 'admin')
+    @@allow('all', auth().role == 'admin')
+    @@index([userId])
+    @@index([courseId])
+    @@index([stripeSessionId])
+   
+
+    @@map('payment')
 }

@@ -104,6 +104,12 @@ export class SchemaType implements SchemaDef {
                     optional: true,
                     attributes: [{ name: "@allow", args: [{ name: "operation", value: ExpressionUtils.literal("update") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] }] as readonly AttributeApplication[]
                 },
+                payments: {
+                    name: "payments",
+                    type: "Payment",
+                    array: true,
+                    relation: { opposite: "user" }
+                },
                 coursesTaught: {
                     name: "coursesTaught",
                     type: "Course",
@@ -408,6 +414,12 @@ export class SchemaType implements SchemaDef {
                     array: true,
                     relation: { opposite: "course" }
                 },
+                payments: {
+                    name: "payments",
+                    type: "Payment",
+                    array: true,
+                    relation: { opposite: "course" }
+                },
                 createdAt: {
                     name: "createdAt",
                     type: "DateTime",
@@ -650,6 +662,12 @@ export class SchemaType implements SchemaDef {
                     type: "DateTime",
                     attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
                     default: ExpressionUtils.call("now") as FieldDefault
+                },
+                payment: {
+                    name: "payment",
+                    type: "Payment",
+                    optional: true,
+                    relation: { opposite: "enrollment" }
                 }
             },
             attributes: [
@@ -746,6 +764,136 @@ export class SchemaType implements SchemaDef {
                 id: { type: "String" },
                 userId_lessonId: { userId: { type: "String" }, lessonId: { type: "String" } }
             }
+        },
+        Payment: {
+            name: "Payment",
+            fields: {
+                id: {
+                    name: "id",
+                    type: "String",
+                    id: true,
+                    attributes: [{ name: "@id" }, { name: "@default", args: [{ name: "value", value: ExpressionUtils.call("cuid") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("cuid") as FieldDefault
+                },
+                userId: {
+                    name: "userId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "user"
+                    ] as readonly string[]
+                },
+                user: {
+                    name: "user",
+                    type: "User",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("SetNull") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "payments", fields: ["userId"], references: ["id"], onDelete: "SetNull" }
+                },
+                courseId: {
+                    name: "courseId",
+                    type: "String",
+                    optional: true,
+                    foreignKeyFor: [
+                        "course"
+                    ] as readonly string[]
+                },
+                course: {
+                    name: "course",
+                    type: "Course",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("courseId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("SetNull") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "payments", fields: ["courseId"], references: ["id"], onDelete: "SetNull" }
+                },
+                enrollmentId: {
+                    name: "enrollmentId",
+                    type: "String",
+                    unique: true,
+                    optional: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[],
+                    foreignKeyFor: [
+                        "enrollment"
+                    ] as readonly string[]
+                },
+                enrollment: {
+                    name: "enrollment",
+                    type: "Enrollment",
+                    optional: true,
+                    attributes: [{ name: "@relation", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("enrollmentId")]) }, { name: "references", value: ExpressionUtils.array("String", [ExpressionUtils.field("id")]) }, { name: "onDelete", value: ExpressionUtils.literal("SetNull") }] }] as readonly AttributeApplication[],
+                    relation: { opposite: "payment", fields: ["enrollmentId"], references: ["id"], onDelete: "SetNull" }
+                },
+                userEmail: {
+                    name: "userEmail",
+                    type: "String"
+                },
+                courseTitle: {
+                    name: "courseTitle",
+                    type: "String"
+                },
+                price: {
+                    name: "price",
+                    type: "Int"
+                },
+                currency: {
+                    name: "currency",
+                    type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("usd") }] }] as readonly AttributeApplication[],
+                    default: "usd" as FieldDefault
+                },
+                status: {
+                    name: "status",
+                    type: "PaymentStatus",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("PENDING") }] }] as readonly AttributeApplication[],
+                    default: "PENDING" as FieldDefault
+                },
+                provider: {
+                    name: "provider",
+                    type: "String",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.literal("stripe") }] }] as readonly AttributeApplication[],
+                    default: "stripe" as FieldDefault
+                },
+                stripeSessionId: {
+                    name: "stripeSessionId",
+                    type: "String",
+                    unique: true,
+                    optional: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
+                },
+                stripePaymentIntentId: {
+                    name: "stripePaymentIntentId",
+                    type: "String",
+                    unique: true,
+                    optional: true,
+                    attributes: [{ name: "@unique" }] as readonly AttributeApplication[]
+                },
+                createdAt: {
+                    name: "createdAt",
+                    type: "DateTime",
+                    attributes: [{ name: "@default", args: [{ name: "value", value: ExpressionUtils.call("now") }] }] as readonly AttributeApplication[],
+                    default: ExpressionUtils.call("now") as FieldDefault
+                },
+                updatedAt: {
+                    name: "updatedAt",
+                    type: "DateTime",
+                    updatedAt: true,
+                    attributes: [{ name: "@updatedAt" }] as readonly AttributeApplication[]
+                }
+            },
+            attributes: [
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("read") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.field("userId"), "!=", ExpressionUtils._null()), "&&", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["id"]), "==", ExpressionUtils.field("userId"))), "||", ExpressionUtils.binary(ExpressionUtils.binary(ExpressionUtils.field("course"), "!=", ExpressionUtils._null()), "&&", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.field("course"), ["instructorId"]), "==", ExpressionUtils.member(ExpressionUtils.call("auth"), ["id"])))), "||", ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin"))) }] },
+                { name: "@@allow", args: [{ name: "operation", value: ExpressionUtils.literal("all") }, { name: "condition", value: ExpressionUtils.binary(ExpressionUtils.member(ExpressionUtils.call("auth"), ["role"]), "==", ExpressionUtils.literal("admin")) }] },
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("userId")]) }] },
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("courseId")]) }] },
+                { name: "@@index", args: [{ name: "fields", value: ExpressionUtils.array("String", [ExpressionUtils.field("stripeSessionId")]) }] },
+                { name: "@@map", args: [{ name: "name", value: ExpressionUtils.literal("payment") }] }
+            ] as readonly AttributeApplication[],
+            idFields: ["id"],
+            uniqueFields: {
+                id: { type: "String" },
+                enrollmentId: { type: "String" },
+                stripeSessionId: { type: "String" },
+                stripePaymentIntentId: { type: "String" }
+            }
         }
     } as const;
     enums = {
@@ -756,6 +904,15 @@ export class SchemaType implements SchemaDef {
                 PROCESSING: "PROCESSING",
                 READY: "READY",
                 FAILED: "FAILED"
+            }
+        },
+        PaymentStatus: {
+            name: "PaymentStatus",
+            values: {
+                PENDING: "PENDING",
+                COMPLETED: "COMPLETED",
+                FAILED: "FAILED",
+                REFUNDED: "REFUNDED"
             }
         }
     } as const;

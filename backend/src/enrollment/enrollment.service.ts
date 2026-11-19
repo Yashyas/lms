@@ -20,6 +20,7 @@ export class EnrollmentService {
         id: true,
         published: true,
         title: true,
+        price: true,
         instructorId: true,
       },
     });
@@ -28,6 +29,9 @@ export class EnrollmentService {
     if (!course.published) throw new BadRequestException('Course is not published');
     if (course.instructorId === user.id) {
       throw new BadRequestException('Instructors cannot enroll in their own courses');
+    }
+    if (course.price > 0) {
+      throw new BadRequestException('This course requires payment');
     }
 
     //Check if user is already enrolled
@@ -123,6 +127,14 @@ export class EnrollmentService {
   async remove(id: string, user: AuthUser) {
     const enrollment = await this.db.forUser(user).enrollment.findUnique({
       where: { id },
+      include: {
+        course: {
+          select: { title: true, price: true }
+        },
+        payment: {
+          select: { status: true }
+        }
+      }
     });
 
     if (!enrollment) throw new NotFoundException('Enrollment not found');
@@ -131,10 +143,17 @@ export class EnrollmentService {
       throw new ForbiddenException('You are not authorized to remove this enrollment');
     }
 
+    const isPaidCourse = enrollment.course.price > 0 || enrollment.payment?.status === 'COMPLETED';
+    if (isPaidCourse && user.role !== 'admin') {
+      throw new BadRequestException(
+        'Cannot unenroll from a purchased course. Please request a refund through payments.',
+      );
+    }
+
     const deletedEnrollment = await this.db.forUser(user).enrollment.delete({
       where: { id },
     });
 
-    return { message: 'Enrollment deleted successfully', deletedEnrollment };
+    return { message: `You have been unenrolled from ${enrollment.course.title} successfully`, deletedEnrollment };
   }
 }

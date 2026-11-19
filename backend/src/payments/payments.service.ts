@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import Stripe from 'stripe';
 import { AuthUser, DbPoolService } from '../db-pool/db-pool.service.js';
 import { ConfigService } from '@nestjs/config';
@@ -15,7 +15,7 @@ export class PaymentsService {
   ) {
     const secretKey = this.config.getOrThrow<string>('STRIPE_SECRET_KEY');
     this.stripe = new Stripe(secretKey, {
-      apiVersion: '2026-10-28.endive' as any,
+      apiVersion: '2026-10-28.endive',
     });
   }
 
@@ -61,6 +61,7 @@ export class PaymentsService {
       throw new ConflictException('You are already enrolled in this course')
     }
 
+    // create pending payment in db 
     const payment = await this.db.payment.create({
       data: {
         userId: user.id,
@@ -74,7 +75,7 @@ export class PaymentsService {
       },
     })
 
-    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL', 'http://localhost:3001');
+    const frontendUrl = this.config.getOrThrow<string>('FRONTEND_URL');
 
     // stripe checkout session 
     const session = await this.stripe.checkout.sessions.create({
@@ -82,6 +83,13 @@ export class PaymentsService {
       customer_email: user.email,
       customer_creation: 'always',
       client_reference_id: payment.id,
+      payment_intent_data: {
+        metadata: {
+          paymentId: payment.id,
+          courseId: course.id,
+          userId: user.id,
+        },
+      },
       line_items: [
         {
           price_data: {
@@ -100,8 +108,8 @@ export class PaymentsService {
         courseId: course.id,
         userId: user.id,
       },
-      success_url: `${frontendUrl}/payment-success?paymentId={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${frontendUrl}/payment-cancel`,
+      success_url: `${frontendUrl}/payment-success?sessionId={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${frontendUrl}/courses/${course.slug}?canceled=true`,
     })
 
     // save stripe session into db
@@ -115,24 +123,268 @@ export class PaymentsService {
     return { url: session.url, sessionId: session.id, }
   }
 
+  // idempotent order payment complete 
+  async fulfillOrder(session: Stripe.Checkout.Session) {
+    const paymentId = session.metadata?.paymentId
+    const courseId = session.metadata?.courseId
+    const userId = session.metadata?.userId
 
-  fulfillOrder() {
-    return `This action returns all payments`;
+    if (!paymentId || !courseId || !userId) {
+      this.logger.warn(`Missing metadata in checkout session: ${session.id}`);
+      return;
+    }
+
+    // transaction to ensure atomicity  
+    return await this.db.client.$transaction(async (tx) => {
+      // fetch payment record 
+      const payment = await tx.payment.findUnique({
+        where: { id: paymentId },
+      })
+
+      if (!payment) {
+        throw new NotFoundException(`Payment not found for id: ${paymentId}`)
+      }
+
+      if (payment.status === PaymentStatus.COMPLETED) {
+        this.logger.log(`Payment ${paymentId} already completed, skipping`)
+        return payment
+      }
+
+      // if (payment.status !== PaymentStatus.PENDING){
+      //   this.logger.warn(`Payment ${paymentId} is not in pending state, current state: ${payment.status}`)
+      //   return payment
+      // }
+
+      // should we add a check if the cost of course is same as the payment amout before moving to enrollment ? 
+      if (session.amount_total !== null && session.amount_total !== undefined) {
+        if (session.amount_total !== payment.price) {
+          this.logger.error(`Payment amount ${session.amount_total} does not match the course price ${payment.price}`)
+          throw new BadRequestException('Payment amount does not match the course price')
+        }
+      }
+      // create/finds enrollment 
+      const enrollment = await tx.enrollment.upsert({
+        where: {
+          userId_courseId: { userId, courseId },
+        },
+        create: {
+          userId,
+          courseId,
+        },
+        update: {},
+      })
+
+      const paymentIntentId = typeof session.payment_intent === 'string' ? session.payment_intent : session.payment_intent?.id || null;
+
+      // mark payment complete 
+      const updatedPayment = await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: PaymentStatus.COMPLETED,
+          enrollmentId: enrollment.id,
+          stripePaymentIntentId: paymentIntentId,
+          provider: "stripe",
+        }
+      })
+
+      this.logger.log(`Payment ${paymentId} fulfilled successfully for user ${userId}`)
+      return updatedPayment
+    })
+
   }
 
-  verifySession() {
-    return `This action returns a #${id} payment`;
+
+  // instant client side redirect from payment 
+  async verifySession(sessionId: string, user: AuthUser) {
+    const session = await this.stripe.checkout.sessions.retrieve(sessionId)
+
+    if (!session || session.payment_status !== 'paid') {
+      throw new BadRequestException('Payment has not been completed')
+    }
+
+    if (session.metadata?.userId !== user.id) {
+      throw new BadRequestException('Session does not belong to the authenticated user')
+    }
+
+    // call fulfillOrder 
+    const payment = await this.fulfillOrder(session)
+
+    const course = await this.db.client.course.findUnique({
+      where: { id: session.metadata.courseId },
+      select: {
+        slug: true,
+        title: true,
+      }
+    })
+
+    return {
+      success: true,
+      courseSlug: course?.slug,
+      courseTitle: course?.title,
+      payment,
+    }
   }
 
-  revokeEnrollment(id: number) {
-    return `This action updates a #${id} payment`;
+  // revocation triggered by refund  
+  async revokeEnrollment(paymentIntentId: string) {
+    if (!paymentIntentId) return
+
+    const payment = await this.db.client.payment.findUnique({
+      where: { stripePaymentIntentId: paymentIntentId },
+    })
+
+    if (!payment) {
+      this.logger.warn(`No payment found for refunded intent: ${paymentIntentId}`)
+      return
+    }
+
+    return await this.db.client.$transaction(async (tx) => {
+
+      // delete enrollment if still enrolled 
+      if (payment.enrollmentId) {
+        await tx.enrollment.deleteMany({
+          where: { id: payment.enrollmentId }
+        })
+      }
+
+      // mark payment refund
+      return await tx.payment.update({
+        where: { id: payment.id },
+        data: {
+          status: PaymentStatus.REFUNDED,
+          enrollmentId: null,
+        }
+      })
+    })
+
   }
 
-  getMyPayments() {
-    return `This action removes a #${id} payment`;
+  // called by admin only for refund action
+  async refundPayment(paymentId: string, user: AuthUser) {
+    if (user.role !== 'admin') {
+      throw new ForbiddenException('Only administrators can issue refunds')
+    }
+
+    const payment = await this.db.client.payment.findUnique({
+      where: { id: paymentId },
+    })
+
+    if (!payment) {
+      throw new NotFoundException(`Payment ${paymentId} not found`)
+    }
+
+    if (payment.status !== PaymentStatus.COMPLETED) {
+      throw new BadRequestException('Only completed payments can be refunded')
+    }
+
+    if (!payment.stripePaymentIntentId) {
+      throw new BadRequestException('Missing stripe payment intent id, cannot refund this payment')
+    }
+
+    // refund the payment
+    const refund = await this.stripe.refunds.create({
+      payment_intent: payment.stripePaymentIntentId,
+    })
+
+    // revoke enrollment 
+    await this.revokeEnrollment(payment.stripePaymentIntentId)
+
+    return {
+      success: true,
+      refundId: refund.id,
+      status: refund.status,
+    }
   }
 
-  getCoursePayments() {
-    return `This action removes a #${id} payment`;
+  // get payments for studets 
+  async getMyPayments(user: AuthUser) {
+    return await this.db.forUser(user).payment.findMany({
+      where: {
+        userId: user.id
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            price: true,
+            thumbnail: true,
+
+          }
+        }
+      }
+    })
   }
+
+  async getCoursePayments(courseId: string, user: AuthUser) {
+    const course = await this.db.forUser(user).course.findUnique({
+      where: { id: courseId },
+      select: {
+        id: true,
+        instructorId: true,
+      }
+    })
+
+    if (!course) {
+      throw new NotFoundException(`Course not found`)
+    }
+
+    if (course.instructorId !== user.id && user.role !== 'admin') {
+      throw new ForbiddenException(`You are not authorized to view payments for this course`)
+    }
+
+    return await this.db.forUser(user).payment.findMany({
+      where: { courseId: courseId },
+      orderBy: { createdAt: 'desc' },
+    })
+  }
+
+  async markpaymentFailed(sessionOrPaymentIntentId: string, reason?: string) {
+    // find payment by either stripeSessionId or stripepaymentIntentId 
+    const payment = await this.db.client.payment.findFirst({
+      where: {
+        OR: [
+          { stripeSessionId: sessionOrPaymentIntentId },
+          { stripePaymentIntentId: sessionOrPaymentIntentId },
+        ],
+      },
+    })
+
+    if (!payment) {
+      this.logger.warn(`No payment record found to mark as failed for ID: ${sessionOrPaymentIntentId}`)
+      return
+    }
+
+    if (payment.status === PaymentStatus.COMPLETED || payment.status === PaymentStatus.REFUNDED) {
+      return payment
+    }
+
+    const updatedPayment = await this.db.client.payment.update({
+      where: { id: payment.id },
+      data: {
+        status: PaymentStatus.FAILED,
+      },
+    })
+
+    this.logger.log(`Payment ${payment.id} marked as failed. Reason:${reason || "Payment failed or session expired"}`)
+    return updatedPayment
+  }
+
+  // Webhook event construction 
+  constructWebhookEvent(rawBody: Buffer, signature: string, secret: string): Stripe.Event {
+    try {
+      return this.stripe.webhooks.constructEvent(rawBody, signature, secret) as Stripe.Event
+    } catch (err: any) {
+      this.logger.error(`Webhook validation failed: ${err.message} `)
+      throw new BadRequestException(`Webhook validation failed: ${err.message}`)
+    }
+  }
+
+
+
+
 }
