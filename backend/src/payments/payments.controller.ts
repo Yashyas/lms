@@ -5,6 +5,7 @@ import { AllowAnonymous, Roles, Session, type UserSession } from '@thallesp/nest
 import { VerifySessionDto } from './dto/verify-session.dto.js';
 import Stripe from 'stripe';
 import type { Request } from 'express';
+import { SkipThrottle, Throttle } from '@nestjs/throttler';
 
 @Controller('payments')
 export class PaymentsController {
@@ -16,6 +17,7 @@ export class PaymentsController {
   /**
  * 1. Create a checkout session (Authenticated Student)
  */
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('checkout/:courseId')
   createCheckout(@Param("courseId") courseId: string, @Session() session: UserSession) {
     return this.paymentsService.createCheckoutSession(courseId, session.user);
@@ -60,6 +62,7 @@ export class PaymentsController {
   /**
    * 6. Stripe Webhook Listener (Authoritative background sync)
    */
+  @SkipThrottle()
   @Post('webhook')
   @AllowAnonymous()
   async handleWebhook(
@@ -79,6 +82,10 @@ export class PaymentsController {
 
     switch (event.type) {
       case 'checkout.session.completed':
+        await this.paymentsService.fulfillOrder(event.data.object as Stripe.Checkout.Session)
+        break
+
+      case 'checkout.session.async_payment_succeeded':
         await this.paymentsService.fulfillOrder(event.data.object as Stripe.Checkout.Session)
         break
 

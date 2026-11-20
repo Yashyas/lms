@@ -96,7 +96,7 @@ export class PaymentsService {
             currency: 'usd',
             product_data: {
               name: course.title,
-              images: course.thumbnail ? [course.thumbnail] : [],
+              images: course.thumbnail && course.thumbnail.startsWith('http') ? [course.thumbnail] : [],
             },
             unit_amount: course.price,
           },
@@ -129,6 +129,11 @@ export class PaymentsService {
     const courseId = session.metadata?.courseId
     const userId = session.metadata?.userId
 
+    if (session.payment_status !== 'paid') {
+      this.logger.warn(`Session ${session.id} payment_status is '${session.payment_status}', not 'paid'. Holding enrollment.`);
+      return;
+    }
+
     if (!paymentId || !courseId || !userId) {
       this.logger.warn(`Missing metadata in checkout session: ${session.id}`);
       return;
@@ -150,17 +155,23 @@ export class PaymentsService {
         return payment
       }
 
-      // if (payment.status !== PaymentStatus.PENDING){
-      //   this.logger.warn(`Payment ${paymentId} is not in pending state, current state: ${payment.status}`)
-      //   return payment
-      // }
+      if (payment.status === PaymentStatus.REFUNDED) {
+        this.logger.warn(`Payment ${paymentId} has already been refunded. Refusing fulfillment.`)
+        return payment
+      }
 
-      // should we add a check if the cost of course is same as the payment amout before moving to enrollment ? 
-      if (session.amount_total !== null && session.amount_total !== undefined) {
-        if (session.amount_total !== payment.price) {
-          this.logger.error(`Payment amount ${session.amount_total} does not match the course price ${payment.price}`)
-          throw new BadRequestException('Payment amount does not match the course price')
-        }
+      // check if the cost of course is same as the payment amout before moving to enrollment
+      if (session.amount_total === null || session.amount_total === undefined) {
+        this.logger.error(`Session ${session.id} is missing amount_total from Stripe`)
+        throw new BadRequestException('Invalid Stripe session: missing amount_total')
+      }
+      if (session.amount_total !== payment.price) {
+        this.logger.error(`Payment amount ${session.amount_total} does not match the course price ${payment.price}`)
+        throw new BadRequestException('Payment amount does not match the course price')
+      }
+      if (session.currency && session.currency.toLowerCase() !== payment.currency.toLowerCase()) {
+        this.logger.error(`Currency mismatch: expected ${payment.currency}, received ${session.currency}`)
+        throw new BadRequestException('Payment currency mismatch detected')
       }
       // create/finds enrollment 
       const enrollment = await tx.enrollment.upsert({
@@ -210,7 +221,7 @@ export class PaymentsService {
     const payment = await this.fulfillOrder(session)
 
     const course = await this.db.client.course.findUnique({
-      where: { id: session.metadata.courseId },
+      where: { id: session.metadata?.courseId },
       select: {
         slug: true,
         title: true,
@@ -238,12 +249,26 @@ export class PaymentsService {
       return
     }
 
+    // exit if already refunded 
+    if (payment.status === PaymentStatus.REFUNDED && !payment.enrollmentId) {
+      return payment
+    }
+
     return await this.db.client.$transaction(async (tx) => {
 
       // delete enrollment if still enrolled 
       if (payment.enrollmentId) {
         await tx.enrollment.deleteMany({
           where: { id: payment.enrollmentId }
+        })
+      }
+      // fallback to userId and courseId if enrollmentId is not present 
+      else if (payment.userId && payment.courseId) {
+        await tx.enrollment.deleteMany({
+          where: {
+            userId: payment.userId,
+            courseId: payment.courseId,
+          }
         })
       }
 
@@ -344,6 +369,9 @@ export class PaymentsService {
   }
 
   async markpaymentFailed(sessionOrPaymentIntentId: string, reason?: string) {
+    if (!sessionOrPaymentIntentId) {
+      throw new BadRequestException('Session or payment intent id is required')
+    }
     // find payment by either stripeSessionId or stripepaymentIntentId 
     const payment = await this.db.client.payment.findFirst({
       where: {

@@ -174,8 +174,8 @@ model Enrollment {
     @@unique([userId, courseId])
     @@index([courseId])
     @@index([userId, createdAt])
-    @@allow('read,create', auth().id == userId || auth().role == 'admin')
-    @@allow('read', course.instructorId == auth().id)
+    @@allow('create', (auth().id == userId && course.price == 0) || auth().role == 'admin')
+    @@allow('read', auth().id == userId || course.instructorId == auth().id || auth().role == 'admin')
     @@allow('delete', auth().id == userId || auth().role == 'admin')
     @@map('enrollment')
 
