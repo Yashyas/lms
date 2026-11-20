@@ -1,7 +1,6 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { UpdateVideoAssetDto } from './dto/update-video-asset.dto.js';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { AuthUser, DbPoolService } from '../db-pool/db-pool.service.js';
-import { GetUploadVideoUrlDto } from './dto/create-video-asset.dto.js';
+import { GetUploadVideoUrlDto } from './dto/get-upload-video-url.dto.js';
 import { VideoStatus } from '@lms/db';
 import { StorageService } from '../storage/storage.service.js';
 import { InjectQueue } from '@nestjs/bullmq';
@@ -56,6 +55,15 @@ export class VideoAssetService {
 
   // this function needs improvement will look into it in future 
   async markupUploadComplete(id: string, user: AuthUser) {
+    // check for existing process 
+    const existing = await this.db.forUser(user).videoAsset.findUnique({
+      where: { lessonId: id },
+      select: { status: true },
+    });
+    if (existing?.status === VideoStatus.PROCESSING) {
+      throw new BadRequestException('Transcoding is already in progress for this lesson');
+    }
+
     const changedVideoAsset = await this.db.forUser(user).videoAsset.update({
       where: { lessonId: id },
       data: {
@@ -67,7 +75,7 @@ export class VideoAssetService {
       videoAssetId: changedVideoAsset.id,
       lessonId: changedVideoAsset.lessonId,
       rawStorageKey: changedVideoAsset.rawStorageKey,
-    })
+    }, { jobId: `transcode-${changedVideoAsset.id}`, removeOnComplete: false, removeOnFail: false })
 
     return changedVideoAsset;
   }

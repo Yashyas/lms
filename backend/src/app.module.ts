@@ -25,7 +25,7 @@ import { PaymentsModule } from './payments/payments.module.js';
       envFilePath: ['.env', '../.env']
     }),
     DbPoolModule,
-    AuthModule.forRoot({ auth }),
+    AuthModule.forRoot({ auth, bodyParser: { rawBody: true } }),
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 100,

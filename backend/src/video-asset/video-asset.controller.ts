@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Res } from '@nestjs/common';
 import { VideoAssetService } from './video-asset.service.js';
 import { AllowAnonymous, Session, type UserSession } from '@thallesp/nestjs-better-auth';
-import { GetUploadVideoUrlDto } from './dto/create-video-asset.dto.js';
+import { GetUploadVideoUrlDto } from './dto/get-upload-video-url.dto.js';
 import type { Response } from 'express';
 
 @Controller(['video-asset', 'videos', 'api/videos'])
