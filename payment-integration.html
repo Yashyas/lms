@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS Stripe Payment Integration Plan</title>
+  <title>LMS Stripe Payment Integration Architecture & Status</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -22,6 +22,12 @@
       --tag-bg: #f4f4f5;
       --tag-border: #e4e4e7;
       --code-bg: #f4f4f5;
+      --success: #16a34a;
+      --success-bg: rgba(22, 163, 74, 0.08);
+      --success-border: rgba(22, 163, 74, 0.25);
+      --warning: #d97706;
+      --warning-bg: rgba(217, 119, 6, 0.08);
+      --warning-border: rgba(217, 119, 6, 0.25);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
       --radius: 10px;
@@ -42,6 +48,12 @@
       --tag-bg: #1c1c20;
       --tag-border: #27272a;
       --code-bg: #18181b;
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.1);
+      --success-border: rgba(34, 197, 94, 0.3);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --warning-border: rgba(245, 158, 11, 0.3);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
       --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
     }
@@ -64,7 +76,7 @@
     }
 
     .container {
-      max-width: 1040px;
+      max-width: 1080px;
       margin: 0 auto;
       padding: 0 24px;
     }
@@ -103,11 +115,11 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background-color: var(--text);
+      background-color: var(--success);
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 30px;
       font-weight: 700;
       letter-spacing: -0.03em;
       color: var(--text);
@@ -116,8 +128,8 @@
 
     .subtitle {
       color: var(--text-muted);
-      font-size: 15px;
-      max-width: 680px;
+      font-size: 14.5px;
+      max-width: 760px;
     }
 
     .header-actions {
@@ -152,6 +164,46 @@
       width: 38px;
       height: 38px;
       padding: 0;
+    }
+
+    /* Status Grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .status-stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-stat-label {
+      font-size: 11.5px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .status-stat-value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
     /* Tab Navigation */
@@ -213,6 +265,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .card-title {
@@ -233,10 +287,22 @@
       font-weight: 500;
     }
 
+    .badge-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
     .badge-primary {
       background: var(--accent);
       color: var(--accent-contrast);
       border-color: var(--accent);
+    }
+
+    .badge-warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: var(--warning-border);
     }
 
     /* Flow Steps */
@@ -403,6 +469,18 @@
       color: var(--text-muted);
     }
 
+    .check-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      margin-left: 6px;
+      text-decoration: none !important;
+      display: inline-block;
+    }
+
     /* Progress bar */
     .progress-wrap {
       margin-bottom: 24px;
@@ -487,9 +565,9 @@
     <div class="container">
       <div class="header-top">
         <div>
-          <div class="brand-eyebrow">Payment Engineering Spec</div>
-          <h1>LMS Stripe Integration Architecture</h1>
-          <p class="subtitle">Two-stage roadmap: Stage 1 delivers zero-friction local testing via Client Redirect Verification; Stage 2 provides production hardening via Webhooks.</p>
+          <div class="brand-eyebrow">Payment Engineering Spec &amp; Audit</div>
+          <h1>LMS Stripe Payment Integration</h1>
+          <p class="subtitle">Complete backend architecture: dual-channel fulfillment (Immediate Client Redirect + Authoritative Webhooks), automated refund revocation, rate limiting, and ZenStack policy isolation.</p>
         </div>
         <div class="header-actions">
           <button class="btn theme-toggle" id="themeToggleBtn" title="Toggle Theme">
@@ -508,12 +586,39 @@
         </div>
       </div>
 
+      <!-- Quick Metrics -->
+      <div class="status-grid">
+        <div class="status-stat-card">
+          <div class="status-stat-label">Implementation Status</div>
+          <div class="status-stat-value" style="color: var(--success);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Complete
+          </div>
+          <div class="status-stat-sub">Verified &amp; build-passing</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">API Endpoints</div>
+          <div class="status-stat-value">6 Endpoints</div>
+          <div class="status-stat-sub">Checkout, verify, history, refund, webhook</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">Webhook Handlers</div>
+          <div class="status-stat-value">6 Events</div>
+          <div class="status-stat-sub">Completed, async, expired, failed, refund</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">Database &amp; Policies</div>
+          <div class="status-stat-value">ZenStack RLS</div>
+          <div class="status-stat-sub">Student &amp; instructor isolation</div>
+        </div>
+      </div>
+
       <!-- Navigation Tabs -->
       <nav class="tabs-nav">
-        <button class="tab-btn active" data-tab="flow">Architecture & Flow</button>
-        <button class="tab-btn" data-tab="stage1">Stage 1: Local Setup</button>
-        <button class="tab-btn" data-tab="stage2">Stage 2: Production Webhooks</button>
-        <button class="tab-btn" data-tab="schema">Database Schema</button>
+        <button class="tab-btn active" data-tab="flow">Architecture &amp; Flow</button>
+        <button class="tab-btn" data-tab="endpoints">Implemented API Endpoints</button>
+        <button class="tab-btn" data-tab="schema">Database Schema &amp; Policies</button>
+        <button class="tab-btn" data-tab="webhooks">Webhook &amp; Refund Engine</button>
         <button class="tab-btn" data-tab="checklist">Interactive Checklist</button>
       </nav>
     </div>
@@ -524,43 +629,47 @@
     <!-- TAB 1: ARCHITECTURE & FLOW -->
     <section class="tab-pane active" id="pane-flow">
       <!-- Current Status Alert -->
-      <div class="card" style="border-left: 4px solid #16a34a; background: rgba(34, 197, 94, 0.04); margin-bottom: 24px;">
+      <div class="card" style="border-left: 4px solid var(--success); background: var(--success-bg); margin-bottom: 24px;">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-          <strong style="color: #16a34a; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+          <strong style="color: var(--success); font-size: 14px; display: flex; align-items: center; gap: 8px;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            Current State: Free Course Enrollment Live
+            Dual-Channel Architecture Live in Backend
           </strong>
-          <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; border-color: rgba(34, 197, 94, 0.2);">ACTIVE IN BACKEND</span>
+          <span class="badge badge-success">ACTIVE &amp; HARDENED</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin: 0;">
-          Free course enrollment (<code>price == 0</code>) is already fully implemented in <code>backend/src/enrollment/enrollment.service.ts</code> with duplicate enrollment prevention and instructor ownership checks. The Stripe workflow detailed below is required exclusively for paid courses (<code>price &gt; 0</code>).
+          The LMS payment system uses a <strong>dual-channel fulfillment architecture</strong>. The client redirect verification provides instant UI feedback with zero latency, while the Stripe webhook listener operates as an asynchronous, authoritative safety net for network drops, tab closures, and automated refund revocations.
         </p>
       </div>
 
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Stage 1 Execution Flow (Zero External Tooling)</h2>
-          <span class="badge badge-primary">Client Redirect Verification</span>
+          <h2 class="card-title">Dual-Channel Checkout &amp; Fulfillment Flow</h2>
+          <span class="badge badge-primary">End-to-End Sequence</span>
         </div>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
-          This local architecture requires zero CLI daemons, no Ngrok tunnels, and no raw-body signature verification. Everything runs over standard authenticated REST requests.
-        </p>
 
         <div class="flow-steps">
           <div class="flow-step">
             <div class="flow-number">01</div>
             <div class="flow-content">
-              <div class="flow-title">Student clicks "Buy Course ($49)"</div>
-              <div class="flow-desc">Frontend calls <code>POST /payments/checkout/:courseId</code> with the student's session token.</div>
+              <div class="flow-title">Student clicks "Enroll / Buy Course"</div>
+              <div class="flow-desc">Frontend sends <code>POST /payments/checkout/:courseId</code> with the user's Better-Auth session cookie or Bearer token. (Guarded: Rate limited to 5/min).</div>
             </div>
           </div>
 
           <div class="flow-step">
             <div class="flow-number">02</div>
             <div class="flow-content">
-              <div class="flow-title">Backend initiates Stripe Checkout Session</div>
+              <div class="flow-title">Backend Pre-Validation &amp; Checkout Session Initialization</div>
               <div class="flow-desc">
-                Validates course is published, price &gt; 0, and user isn't already enrolled. Creates a <code>Payment</code> record in Postgres with <code>status: 'pending'</code>. Calls Stripe API and returns <code>checkoutUrl</code>.
+                <code>PaymentsService.createCheckoutSession</code> authoritatively validates:
+                <ul style="margin-top: 6px; padding-left: 18px; font-size: 13px;">
+                  <li>Course exists and <code>published: true</code> (cannot buy unpublished drafts)</li>
+                  <li>Instructor ownership check (instructors cannot purchase their own courses)</li>
+                  <li>Price validation (paid courses only: <code>price &gt; 0</code>; free courses use direct enrollment)</li>
+                  <li>Duplicate enrollment check (throws 409 Conflict if student is already enrolled)</li>
+                </ul>
+                Creates a Postgres record in <code>payment</code> with <code>status: PENDING</code>, calls Stripe API, stores <code>stripeSessionId</code>, and returns <code>{ url, sessionId }</code>.
               </div>
             </div>
           </div>
@@ -568,9 +677,9 @@
           <div class="flow-step">
             <div class="flow-number">03</div>
             <div class="flow-content">
-              <div class="flow-title">Hosted Stripe Checkout &amp; Test Payment</div>
+              <div class="flow-title">Hosted Stripe Checkout &amp; Card Processing</div>
               <div class="flow-desc">
-                Student is redirected to Stripe's secure page. They type test card <code>4242 4242 4242 4242</code> and complete checkout.
+                Student is redirected to Stripe's hosted checkout. Metadata (<code>paymentId</code>, <code>courseId</code>, <code>userId</code>) is embedded in both the session and payment intent.
               </div>
             </div>
           </div>
@@ -578,9 +687,11 @@
           <div class="flow-step">
             <div class="flow-number">04</div>
             <div class="flow-content">
-              <div class="flow-title">Stripe Redirects Back to Next.js Frontend</div>
+              <div class="flow-title">Channel A: Immediate Client Redirect Verification (Zero UI Delay)</div>
               <div class="flow-desc">
-                Browser lands on <code>http://localhost:3001/courses/:id?success=true&amp;session_id=cs_test_...</code>.
+                Browser redirects back to <code>/payment-success?sessionId={CHECKOUT_SESSION_ID}</code>. The frontend immediately calls <code>POST /payments/verify-session { sessionId }</code>.
+                Backend queries Stripe, validates <code>payment_status === 'paid'</code>, and executes <code>fulfillOrder()</code> in an atomic transaction:
+                updates <code>Payment</code> to <code>COMPLETED</code> and inserts the <code>Enrollment</code> record.
               </div>
             </div>
           </div>
@@ -588,9 +699,21 @@
           <div class="flow-step">
             <div class="flow-number">05</div>
             <div class="flow-content">
-              <div class="flow-title">Immediate Verification &amp; Instant Enrollment</div>
+              <div class="flow-title">Channel B: Asynchronous Authoritative Webhook Sync (Safety Net)</div>
               <div class="flow-desc">
-                Frontend calls <code>POST /payments/verify-session { sessionId }</code>. Backend checks with Stripe: <code>session.payment_status === 'paid'</code>. In an atomic transaction, it updates the Payment to <code>completed</code> and creates the <code>Enrollment</code> record!
+                Stripe sends <code>checkout.session.completed</code> or <code>checkout.session.async_payment_succeeded</code> to <code>POST /payments/webhook</code>.
+                Verified via raw-body signature matching. <code>fulfillOrder()</code> runs idempotently — if Channel A already enrolled the user, it cleanly detects the existing record and safely skips duplicate creation.
+              </div>
+            </div>
+          </div>
+
+          <div class="flow-step">
+            <div class="flow-number">06</div>
+            <div class="flow-content">
+              <div class="flow-title">Channel C: Refund &amp; Automatic Enrollment Revocation</div>
+              <div class="flow-desc">
+                When an administrator issues a refund via <code>POST /payments/refund/:paymentId</code> or directly inside the Stripe Dashboard, Stripe emits <code>charge.refunded</code>.
+                Backend's <code>revokeEnrollment()</code> finds the associated <code>Enrollment</code>, removes student access, and flips payment status to <code>REFUNDED</code>.
               </div>
             </div>
           </div>
@@ -598,200 +721,285 @@
       </div>
 
       <div class="card">
-        <h2 class="card-title" style="margin-bottom: 12px;">Stage 1 vs. Stage 2 Comparison</h2>
+        <h2 class="card-title" style="margin-bottom: 12px;">Fulfillment Comparison: Redirect vs. Webhooks</h2>
         <table>
           <thead>
             <tr>
               <th>Feature</th>
-              <th>Stage 1 (Local Setup)</th>
-              <th>Stage 2 (Production)</th>
+              <th>Channel A: Client Redirect Verification</th>
+              <th>Channel B: Stripe Webhook Listener</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td><strong>Verification Method</strong></td>
-              <td>Client Redirect (<code>/payments/verify-session</code>)</td>
-              <td>Hybrid: Client Redirect + Background Webhook</td>
+              <td><strong>Primary Purpose</strong></td>
+              <td>Instant student access &amp; immediate celebratory screen</td>
+              <td>Authoritative background reconciliation &amp; async payments</td>
             </tr>
             <tr>
-              <td><strong>External Tools Required</strong></td>
-              <td><strong>None</strong> (Zero CLI, no ngrok)</td>
-              <td>Stripe CLI or Public Domain for Webhooks</td>
+              <td><strong>Endpoint</strong></td>
+              <td><code>POST /payments/verify-session</code></td>
+              <td><code>POST /payments/webhook</code></td>
             </tr>
             <tr>
-              <td><strong>Setup Time</strong></td>
-              <td>Instant (copy <code>sk_test_...</code>)</td>
-              <td>Requires Webhook Secret (<code>whsec_...</code>)</td>
+              <td><strong>Authorization</strong></td>
+              <td>Authenticated Student Session (Rate limited: 15/min)</td>
+              <td>Anonymous with <code>stripe-signature</code> HMAC verification</td>
+            </tr>
+            <tr>
+              <td><strong>Failure Resilience</strong></td>
+              <td>Vulnerable if user closes tab immediately</td>
+              <td>100% resilient; Stripe retries with exponential backoff</td>
+            </tr>
+            <tr>
+              <td><strong>Async Payment Support</strong></td>
+              <td>Holds enrollment if payment status is pending</td>
+              <td>Enrolls student when <code>async_payment_succeeded</code> fires</td>
             </tr>
             <tr>
               <td><strong>Refund Handling</strong></td>
-              <td>Manual via Admin Dashboard</td>
-              <td>Automated via <code>charge.refunded</code> webhook</td>
-            </tr>
-            <tr>
-              <td><strong>Production Code Reuse</strong></td>
-              <td>100% reusable</td>
-              <td>Adds webhook endpoint without breaking Stage 1</td>
+              <td>N/A</td>
+              <td>Automated revocation via <code>charge.refunded</code></td>
             </tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- TAB 2: STAGE 1 LOCAL SETUP -->
-    <section class="tab-pane" id="pane-stage1">
+    <!-- TAB 2: IMPLEMENTED API ENDPOINTS -->
+    <section class="tab-pane" id="pane-endpoints">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Backend Code Architecture: Stage 1</h2>
-          <span class="badge">NestJS Implementation</span>
+          <h2 class="card-title">PaymentsController REST Specification</h2>
+          <span class="badge badge-success">6 Endpoints Live</span>
         </div>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+          All endpoints are fully implemented in <code>backend/src/payments/payments.controller.ts</code> and wired to <code>PaymentsService</code> with NestJS guards and Throttler rate limits.
+        </p>
 
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">1. Install Official Stripe SDK</h3>
-        <pre><code>pnpm --filter backend add stripe</code></pre>
-
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">2. Environment Variables (.env)</h3>
-        <pre><code># Stripe Test Key (from dashboard.stripe.com)
-STRIPE_SECRET_KEY=sk_test_51...
-FRONTEND_URL=http://localhost:3001</code></pre>
-
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">3. DTO: verify-session.dto.ts</h3>
-        <pre><code>import { IsNotEmpty, IsString } from 'class-validator';
-
-export class VerifySessionDto {
-  @IsString()
-  @IsNotEmpty()
-  sessionId: string;
+        <div style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Endpoint 1 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-primary">POST</span>
+                <code style="font-weight: 600;">/payments/checkout/:courseId</code>
+              </div>
+              <span class="badge">Throttle: 5/min | Authenticated Student</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Validates course price &amp; eligibility, creates a <code>PENDING</code> Payment record, and generates a Stripe Checkout Session with product thumbnail and line items.
+            </p>
+            <pre><code>// Response (201 Created)
+{
+  "url": "https://checkout.stripe.com/c/pay/cs_test_a1b2c3...",
+  "sessionId": "cs_test_a1b2c3..."
 }</code></pre>
+          </div>
 
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">4. Controller: payments.controller.ts</h3>
-        <pre><code>import { Controller, Post, Param, Body } from '@nestjs/common';
-import { PaymentsService } from './payments.service.js';
-import { VerifySessionDto } from './dto/verify-session.dto.js';
-import { Session, type UserSession } from '@thallesp/nestjs-better-auth';
+          <!-- Endpoint 2 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-primary">POST</span>
+                <code style="font-weight: 600;">/payments/verify-session</code>
+              </div>
+              <span class="badge">Throttle: 15/min | Authenticated Student</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Called on client redirect. Retrieves session from Stripe, validates student ownership, calls atomic <code>fulfillOrder()</code>, and unlocks curriculum.
+            </p>
+            <pre><code>// Request Body
+{ "sessionId": "cs_test_a1b2c3..." }
 
-@Controller('payments')
-export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
-
-  // 1. Create Checkout Session
-  @Post('checkout/:courseId')
-  createCheckout(
-    @Param('courseId') courseId: string,
-    @Session() session: UserSession,
-  ) {
-    return this.paymentsService.createCheckoutSession(courseId, session.user);
-  }
-
-  // 2. Client Redirect Verification (Works locally with zero CLI)
-  @Post('verify-session')
-  verifySession(
-    @Body() dto: VerifySessionDto,
-    @Session() session: UserSession,
-  ) {
-    return this.paymentsService.verifySession(dto.sessionId, session.user);
-  }
+// Response (200 OK)
+{
+  "message": "Payment verified and enrolled successfully",
+  "payment": { "id": "cm3...", "status": "COMPLETED", "price": 4900 },
+  "courseSlug": "nestjs-advanced-masterclass"
 }</code></pre>
+          </div>
+
+          <!-- Endpoint 3 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge">GET</span>
+                <code style="font-weight: 600;">/payments/my-history</code>
+              </div>
+              <span class="badge">Authenticated Student</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Returns all receipts and transaction records for the logged-in student with course title, price paid, status, and enrollment timestamps.
+            </p>
+          </div>
+
+          <!-- Endpoint 4 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge">GET</span>
+                <code style="font-weight: 600;">/payments/course/:courseId</code>
+              </div>
+              <span class="badge">Instructor / Admin Only</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Allows course author or platform administrator to audit sales, customer emails, and payment statuses for a specific course.
+            </p>
+          </div>
+
+          <!-- Endpoint 5 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-primary">POST</span>
+                <code style="font-weight: 600;">/payments/refund/:paymentId</code>
+              </div>
+              <span class="badge badge-warning">Admin Only | Throttle: 10/min</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Issues a direct Stripe refund via <code>stripe.refunds.create({ payment_intent })</code> and immediately triggers <code>revokeEnrollment()</code> inside an atomic database transaction.
+            </p>
+          </div>
+
+          <!-- Endpoint 6 -->
+          <div style="background: var(--surface-subtle); border: 1px solid var(--surface-border); border-radius: 8px; padding: 16px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-primary">POST</span>
+                <code style="font-weight: 600;">/payments/webhook</code>
+              </div>
+              <span class="badge">@AllowAnonymous() | @SkipThrottle()</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Consumes unparsed binary <code>req.rawBody</code>, verifies HMAC signature against <code>STRIPE_WEBHOOK_SECRET</code>, and dispatches to handler switchboard.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- TAB 3: STAGE 2 PRODUCTION -->
-    <section class="tab-pane" id="pane-stage2">
+    <!-- TAB 3: DATABASE SCHEMA & POLICIES -->
+    <section class="tab-pane" id="pane-schema">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Stage 2: Production Hardening (Webhooks)</h2>
-          <span class="badge">Future Production</span>
+          <h2 class="card-title">Production schema.zmodel Definition</h2>
+          <span class="badge badge-success">Applied via ZenStack</span>
         </div>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
-          When preparing to go live, keep Stage 1 and attach the Webhook listener as an asynchronous safety net to handle closed tabs, network drops, and automated refunds.
+        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px;">
+          The <code>Payment</code> model in <code>packages/db/zenstack/schema.zmodel</code> includes strict status enums, <code>onDelete: SetNull</code> constraints, snapshot fields, and Row-Level Security:
         </p>
 
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Webhook Controller Endpoint</h3>
-        <pre><code>@Post('webhook')
-@AllowAnonymous()
-async handleWebhook(
-  @Headers('stripe-signature') signature: string,
-  @Req() req: RawBodyRequest&lt;Request&gt;,
-) {
-  const event = this.stripe.webhooks.constructEvent(
-    req.rawBody!, // Requires raw unparsed Buffer
-    signature,
-    this.config.get('STRIPE_WEBHOOK_SECRET')!,
-  );
+        <pre><code>enum PaymentStatus {
+    PENDING
+    COMPLETED
+    FAILED
+    REFUNDED
+}
 
-  if (event.type === 'checkout.session.completed') {
-    await this.paymentsService.fulfillOrder(event.data.object);
-  }
+model Payment {
+    id                    String          @id @default(cuid())
+    userId                String?         
+    user                  User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+    
+    courseId              String?
+    course                Course?         @relation(fields: [courseId], references: [id], onDelete: SetNull)
+    
+    enrollmentId          String?         @unique
+    enrollment            Enrollment?     @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
 
-  if (event.type === 'charge.refunded') {
-    await this.paymentsService.revokeEnrollment(event.data.object);
-  }
+    userEmail             String          // Snapshot: email of user buying course
+    courseTitle           String          // Snapshot: course title at time of purchase
 
-  return { received: true };
+    price                 Int             // stored in cents/paise
+    currency              String          @default("usd")
+    status                PaymentStatus   @default(PENDING)
+    provider              String          @default("stripe")
+    stripeSessionId       String?         @unique
+    stripePaymentIntentId String?         @unique
+   
+    createdAt             DateTime        @default(now())
+    updatedAt             DateTime        @updatedAt
+   
+    // ZenStack Row-Level Security
+    @@allow('read', (userId != null &amp;&amp; auth().id == userId) || (course != null &amp;&amp; course.instructorId == auth().id) || auth().role == 'admin')
+    @@allow('all', auth().role == 'admin')
+    
+    @@index([userId])
+    @@index([courseId])
+    @@index([stripeSessionId])
+   
+    @@map('payment')
 }</code></pre>
 
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Going Live Checklist</h3>
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Key Architectural Decisions:</h3>
         <ul style="padding-left: 20px; font-size: 13.5px; color: var(--text-muted); line-height: 1.8;">
-          <li>Switch <code>STRIPE_SECRET_KEY</code> from <code>sk_test_...</code> to <code>sk_live_...</code></li>
-          <li>Paste the production Webhook Signing Secret into <code>STRIPE_WEBHOOK_SECRET</code></li>
-          <li>That's it — all business logic remains 100% identical!</li>
+          <li><strong>Audit Trail Integrity (<code>onDelete: SetNull</code>):</strong> If a student or course is deleted, financial transaction records are preserved for accounting and tax compliance, backed by snapshot fields (<code>userEmail</code>, <code>courseTitle</code>).</li>
+          <li><strong>Row-Level Security (RLS):</strong> Students can only view their own receipts. Course instructors can only see payments for their own authored courses. Admins have global access.</li>
+          <li><strong>Unique Indexes:</strong> <code>stripeSessionId</code> and <code>stripePaymentIntentId</code> are strictly unique, guaranteeing zero double-processing.</li>
         </ul>
       </div>
     </section>
 
-    <!-- TAB 4: DATABASE SCHEMA -->
-    <section class="tab-pane" id="pane-schema">
+    <!-- TAB 4: WEBHOOK & REFUND ENGINE -->
+    <section class="tab-pane" id="pane-webhooks">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">schema.zmodel Definition</h2>
-          <span class="badge">ZenStack ORM</span>
+          <h2 class="card-title">Webhook Switchboard &amp; Event Matrix</h2>
+          <span class="badge badge-success">6 Handled Events</span>
         </div>
-        <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px;">
-          Add this model to <code>packages/db/zenstack/schema.zmodel</code> right after <code>Enrollment</code>:
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+          The webhook handler in <code>payments.controller.ts</code> processes synchronous and asynchronous lifecycle events with automated database sync:
         </p>
 
-        <pre><code>model Payment {
-    id                    String      @id @default(cuid())
-    
-    // Relations
-    userId                String      @default(auth().id)
-    user                  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-    
-    courseId              String
-    course                Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
-    
-    enrollmentId          String?     @unique
-    enrollment            Enrollment? @relation(fields: [enrollmentId], references: [id], onDelete: SetNull)
+        <table>
+          <thead>
+            <tr>
+              <th>Stripe Event Type</th>
+              <th>Trigger Condition</th>
+              <th>Backend Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>checkout.session.completed</code></td>
+              <td>Card successfully charged in hosted checkout</td>
+              <td>Calls <code>fulfillOrder()</code>: creates Enrollment &amp; sets status <code>COMPLETED</code></td>
+            </tr>
+            <tr>
+              <td><code>checkout.session.async_payment_succeeded</code></td>
+              <td>Delayed payment methods (ACH, SEPA, Boleto) clear</td>
+              <td>Calls <code>fulfillOrder()</code> to enroll student asynchronously</td>
+            </tr>
+            <tr>
+              <td><code>checkout.session.expired</code></td>
+              <td>Student leaves checkout tab open for 24+ hours</td>
+              <td>Calls <code>markpaymentFailed()</code>: sets status <code>FAILED</code></td>
+            </tr>
+            <tr>
+              <td><code>payment_intent.payment_failed</code></td>
+              <td>Card declined or insufficient funds</td>
+              <td>Calls <code>markpaymentFailed()</code> with error reason logged</td>
+            </tr>
+            <tr>
+              <td><code>checkout.session.async_payment_failed</code></td>
+              <td>Delayed payment voucher or bank transfer bounces</td>
+              <td>Calls <code>markpaymentFailed()</code>: prevents unearned enrollment</td>
+            </tr>
+            <tr>
+              <td><code>charge.refunded</code></td>
+              <td>Refund issued in Stripe dashboard or via Admin API</td>
+              <td>Calls <code>revokeEnrollment()</code>: deletes Enrollment &amp; sets status <code>REFUNDED</code></td>
+            </tr>
+          </tbody>
+        </table>
 
-    // Financials
-    amount                Int         // stored in cents/paise
-    currency              String      @default("usd")
-    status                String      @default("pending") // 'pending' | 'completed' | 'failed'
-    
-    // Stripe data
-    provider              String      @default("stripe")
-    stripeSessionId       String?     @unique
-    stripePaymentIntentId String?     @unique
-    
-    createdAt             DateTime    @default(now())
-    updatedAt             DateTime    @updatedAt
-
-    // ZenStack Policies
-    @@allow('read', auth().id == userId || course.instructorId == auth().id || auth().role == 'admin')
-    @@allow('create', auth().id == userId || auth().role == 'admin')
-    @@allow('update', auth().id == userId || auth().role == 'admin')
-
-    @@map('payment')
-}</code></pre>
-
-        <h3 style="font-size: 14px; font-weight: 600; margin-top: 16px;">Relation Updates:</h3>
-        <pre><code>// In model User:
-payments      Payment[]
-
-// In model Course:
-payments      Payment[]
-
-// In model Enrollment:
-payment       Payment?</code></pre>
+        <h3 style="font-size: 14px; font-weight: 600; margin-top: 24px;">Pre-Deployment Security Checklist:</h3>
+        <ul style="padding-left: 20px; font-size: 13.5px; color: var(--text-muted); line-height: 1.8;">
+          <li><strong>Cloudflare WAF Bypass:</strong> Create a Cloudflare WAF rule to bypass Bot Fight Mode and Managed Challenges for <code>/payments/webhook</code> so Stripe IPs are never blocked.</li>
+          <li><strong>Raw Body Preservation:</strong> <code>main.ts</code> specifies <code>bodyParser: false, rawBody: true</code> so Express preserves the unaltered binary Buffer required for Stripe HMAC validation.</li>
+          <li><strong>Rate Limit Exemption:</strong> <code>@SkipThrottle()</code> is applied to <code>/payments/webhook</code> to avoid 429 errors during Stripe bulk test simulations or batch retries.</li>
+        </ul>
       </div>
     </section>
 
@@ -799,8 +1007,8 @@ payment       Payment?</code></pre>
     <section class="tab-pane" id="pane-checklist">
       <div class="progress-wrap">
         <div class="progress-top">
-          <span>Implementation Progress</span>
-          <span id="progressText">0 / 6 Completed (0%)</span>
+          <span>Payment Engineering Milestone Progress</span>
+          <span id="progressText">0 / 12 Completed (0%)</span>
         </div>
         <div class="progress-bar-track">
           <div class="progress-bar-fill" id="progressFill"></div>
@@ -809,46 +1017,100 @@ payment       Payment?</code></pre>
 
       <div class="card" style="padding: 0;">
         <ul class="checklist">
+          <!-- Step 1 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t1" data-id="t1">
+            <input type="checkbox" class="checkbox" id="t1" data-id="t1" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 1: Add Payment model to schema.zmodel</span>
-              <span class="check-desc">Add model Payment and update User, Course, Enrollment relations. Run <code>pnpm generate</code>.</span>
+              <span class="check-title">1. Payment &amp; Status Schema in schema.zmodel <span class="check-tag">BACKEND</span></span>
+              <span class="check-desc">Defined <code>PaymentStatus</code> enum and <code>Payment</code> model with <code>onDelete: SetNull</code> and ZenStack RLS policies.</span>
             </div>
           </li>
+          <!-- Step 2 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t2" data-id="t2">
+            <input type="checkbox" class="checkbox" id="t2" data-id="t2" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 2: Install Stripe in Backend</span>
-              <span class="check-desc">Run <code>pnpm --filter backend add stripe</code> and add <code>STRIPE_SECRET_KEY</code> to <code>.env</code>.</span>
+              <span class="check-title">2. Official Stripe SDK &amp; Configuration <span class="check-tag">BACKEND</span></span>
+              <span class="check-desc">Installed <code>stripe</code> package and wired <code>STRIPE_SECRET_KEY</code> with API version <code>2026-10-28.endive</code>.</span>
             </div>
           </li>
+          <!-- Step 3 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t3" data-id="t3">
+            <input type="checkbox" class="checkbox" id="t3" data-id="t3" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 3: Scaffold PaymentsModule</span>
-              <span class="check-desc">Create <code>payments.module.ts</code> and register it in <code>AppModule</code>.</span>
+              <span class="check-title">3. Scaffold PaymentsModule &amp; App Registration <span class="check-tag">BACKEND</span></span>
+              <span class="check-desc">Registered <code>PaymentsModule</code> in <code>AppModule</code> with dependency injection for <code>DbPoolService</code> and <code>ConfigService</code>.</span>
             </div>
           </li>
+          <!-- Step 4 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t4" data-id="t4">
+            <input type="checkbox" class="checkbox" id="t4" data-id="t4" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 4: Implement POST /payments/checkout/:courseId</span>
-              <span class="check-desc">Validates course, creates pending payment record, creates Stripe Checkout session, returns URL.</span>
+              <span class="check-title">4. POST /payments/checkout/:courseId <span class="check-tag">ENDPOINT</span></span>
+              <span class="check-desc">Course validation (published, price &gt; 0, instructor ownership, duplicate check) &amp; Stripe Checkout Session generation.</span>
             </div>
           </li>
+          <!-- Step 5 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t5" data-id="t5">
+            <input type="checkbox" class="checkbox" id="t5" data-id="t5" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 5: Implement POST /payments/verify-session</span>
-              <span class="check-desc">Retrieves session from Stripe, checks payment_status === 'paid', atomically creates Enrollment.</span>
+              <span class="check-title">5. POST /payments/verify-session (Client Redirect) <span class="check-tag">ENDPOINT</span></span>
+              <span class="check-desc">Immediate client feedback: validates session paid status and invokes atomic <code>fulfillOrder()</code>.</span>
             </div>
           </li>
+          <!-- Step 6 -->
           <li class="check-item">
-            <input type="checkbox" class="checkbox" id="t6" data-id="t6">
+            <input type="checkbox" class="checkbox" id="t6" data-id="t6" checked>
             <div class="check-label-wrap">
-              <span class="check-title">Step 6: End-to-End Test Checkout</span>
-              <span class="check-desc">Test with Stripe test card <code>4242 4242 4242 4242</code> and confirm course lessons unlock.</span>
+              <span class="check-title">6. POST /payments/webhook with RawBody Verification <span class="check-tag">WEBHOOK</span></span>
+              <span class="check-desc">Consumes raw unparsed Buffer with <code>stripe-signature</code> HMAC verification against <code>STRIPE_WEBHOOK_SECRET</code>.</span>
+            </div>
+          </li>
+          <!-- Step 7 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t7" data-id="t7" checked>
+            <div class="check-label-wrap">
+              <span class="check-title">7. Asynchronous Payment Handlers <span class="check-tag">WEBHOOK</span></span>
+              <span class="check-desc">Handles <code>async_payment_succeeded</code> and marks failed payments on <code>expired</code> or <code>payment_failed</code>.</span>
+            </div>
+          </li>
+          <!-- Step 8 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t8" data-id="t8" checked>
+            <div class="check-label-wrap">
+              <span class="check-title">8. Refund Engine &amp; Automatic Enrollment Revocation <span class="check-tag">REVOCATION</span></span>
+              <span class="check-desc"><code>charge.refunded</code> webhook and <code>POST /payments/refund/:paymentId</code> delete enrollment and update payment to <code>REFUNDED</code>.</span>
+            </div>
+          </li>
+          <!-- Step 9 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t9" data-id="t9" checked>
+            <div class="check-label-wrap">
+              <span class="check-title">9. Student History &amp; Instructor Course Payments <span class="check-tag">DASHBOARD</span></span>
+              <span class="check-desc">Implemented <code>GET /payments/my-history</code> and <code>GET /payments/course/:courseId</code> with RLS isolation.</span>
+            </div>
+          </li>
+          <!-- Step 10 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t10" data-id="t10" checked>
+            <div class="check-label-wrap">
+              <span class="check-title">10. Rate Limiting &amp; Anti-Abuse Throttler <span class="check-tag">SECURITY</span></span>
+              <span class="check-desc">Applied granular <code>@Throttle()</code> guards (5/min on checkout, 15/min on verify, 10/min on refund) and <code>@SkipThrottle()</code> on webhooks.</span>
+            </div>
+          </li>
+          <!-- Step 11 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t11" data-id="t11" checked>
+            <div class="check-label-wrap">
+              <span class="check-title">11. Adversarial Test Suites &amp; Verification <span class="check-tag">TESTING</span></span>
+              <span class="check-desc">Authored and executed <code>backend/test/simulate-payment.mjs</code> and <code>security-verification.mjs</code>.</span>
+            </div>
+          </li>
+          <!-- Step 12 -->
+          <li class="check-item">
+            <input type="checkbox" class="checkbox" id="t12" data-id="t12">
+            <div class="check-label-wrap">
+              <span class="check-title">12. Cloudflare WAF Stripe Bypass &amp; Live Keys <span class="check-tag">PRODUCTION</span></span>
+              <span class="check-desc">Configure Cloudflare WAF rule for <code>/payments/webhook</code> and supply production <code>sk_live_...</code> and <code>whsec_...</code> in deployment.</span>
             </div>
           </li>
         </ul>
@@ -903,19 +1165,38 @@ payment       Payment?</code></pre>
     });
 
     // Checklist State with LocalStorage
-    const CHECK_KEY = 'lms_payment_checklist_state';
+    const CHECK_KEY = 'lms_payment_checklist_state_v2';
     const checkboxes = document.querySelectorAll('.checkbox');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     const toast = document.getElementById('toast');
 
+    const DEFAULT_COMPLETED = {
+      t1: true,
+      t2: true,
+      t3: true,
+      t4: true,
+      t5: true,
+      t6: true,
+      t7: true,
+      t8: true,
+      t9: true,
+      t10: true,
+      t11: true,
+      t12: false
+    };
+
     function loadChecklist() {
       try {
-        const data = JSON.parse(localStorage.getItem(CHECK_KEY) || '{}');
+        const raw = localStorage.getItem(CHECK_KEY);
+        const data = raw ? JSON.parse(raw) : DEFAULT_COMPLETED;
         checkboxes.forEach(cb => {
-          if (data[cb.dataset.id]) {
-            cb.checked = true;
+          const isChecked = data[cb.dataset.id] !== undefined ? !!data[cb.dataset.id] : cb.checked;
+          cb.checked = isChecked;
+          if (isChecked) {
             cb.closest('.check-item').classList.add('completed');
+          } else {
+            cb.closest('.check-item').classList.remove('completed');
           }
         });
         updateProgress();
@@ -927,7 +1208,7 @@ payment       Payment?</code></pre>
     function saveChecklist() {
       const data = {};
       checkboxes.forEach(cb => {
-        if (cb.checked) data[cb.dataset.id] = true;
+        data[cb.dataset.id] = cb.checked;
       });
       localStorage.setItem(CHECK_KEY, JSON.stringify(data));
       showToast('Progress updated');

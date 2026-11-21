@@ -17,6 +17,7 @@ import { UsersModule } from './users/users.module.js';
 import { AdminModule } from './admin/admin.module.js';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { PaymentsModule } from './payments/payments.module.js';
+import { AppThrottlerGuard } from './guards/app-throttler.guard.js';
 
 @Module({
   imports: [
@@ -54,7 +55,7 @@ import { PaymentsModule } from './payments/payments.module.js';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: AppThrottlerGuard,
     },
   ],
 })

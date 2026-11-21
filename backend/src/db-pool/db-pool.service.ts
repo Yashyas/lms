@@ -71,7 +71,9 @@ export class DbPoolService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    await this.client?.$disconnect();
-    await this.pool?.end();
+    await this.client?.$disconnect().catch(() => {});
+    if (this.pool && !(this.pool as any).ended) {
+      await this.pool.end().catch(() => {});
+    }
   }
 }

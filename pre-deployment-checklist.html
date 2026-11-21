@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pre-Deployment Checklist</title>
+</head>
+<body>
+  <h2>Pre-Deployment Security & DDoS Checklist</h2>
+  <ul>
+    <li>
+      <input type="checkbox" id="cf-dns">
+      <label for="cf-dns"><strong>1. Cloudflare DNS & Proxy:</strong> Point domain DNS to Cloudflare and enable the Proxy (orange cloud) for automatic L3/L4 DDoS mitigation.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="trust-proxy">
+      <label for="trust-proxy"><strong>2. Express Trust Proxy:</strong> Add <code>app.getHttpAdapter().getInstance().set('trust proxy', 1)</code> in <code>main.ts</code> so the backend gets individual user IPs instead of Cloudflare's IP.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="cf-header">
+      <label for="cf-header"><strong>3. CF-Connecting-IP Header:</strong> Update <code>app-throttler.guard.ts</code> to read <code>req.headers['cf-connecting-ip']</code> to prevent all visitors from sharing one rate-limit quota.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="throttler-redis">
+      <label for="throttler-redis"><strong>4. Throttler on Redis:</strong> Switch NestJS Throttler from in-memory storage to the existing Redis container to prevent Node.js OOM/RAM crashes under traffic spikes.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="tunnel">
+      <label for="tunnel"><strong>5. Hide Origin VPS IP:</strong> Use Cloudflare Tunnel (<code>cloudflared</code>) or lock down VPS firewall (UFW) so direct traffic to ports 80/443/3000 is blocked and cannot bypass Cloudflare.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="stripe-waf">
+      <label for="stripe-waf"><strong>6. Cloudflare WAF Stripe Bypass:</strong> Create a Cloudflare WAF rule to bypass Bot Fight Mode / challenges for <code>/payments/webhook</code> so Stripe payments are never blocked.</label>
+    </li>
+    <li>
+      <input type="checkbox" id="s3-limit">
+      <label for="s3-limit"><strong>7. S3 Upload Check:</strong> Verify presigned video uploads point directly to S3 / Garage storage to avoid Cloudflare Free's 100MB request limit.</label>
+    </li>
+  </ul>
+</body>
+</html>
+

@@ -17,7 +17,7 @@ export class PaymentsController {
   /**
  * 1. Create a checkout session (Authenticated Student)
  */
-  @Throttle({ default: { limit: 10, ttl: 60000 } })
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post('checkout/:courseId')
   createCheckout(@Param("courseId") courseId: string, @Session() session: UserSession) {
     return this.paymentsService.createCheckoutSession(courseId, session.user);
@@ -26,6 +26,7 @@ export class PaymentsController {
   /**
    * 2. Verify session on client redirect (Immediate UI feedback)
    */
+  @Throttle({ default: { limit: 15, ttl: 60000 } })
   @Post('verify-session')
   verifySession(@Body() dto: VerifySessionDto, @Session() session: UserSession) {
     return this.paymentsService.verifySession(dto.sessionId, session.user);
@@ -51,6 +52,7 @@ export class PaymentsController {
    * 5. Active Refund (Admin Only)
    */
   @Roles(['admin'])
+  @Throttle({ default: { limit: 10, ttl: 60000 } })
   @Post('refund/:paymentId')
   refundPayment(
     @Param('paymentId') paymentId: string,
@@ -91,20 +93,23 @@ export class PaymentsController {
 
       case 'checkout.session.expired': {
         const session = event.data.object as Stripe.Checkout.Session
-        await this.paymentsService.markpaymentFailed(session.id, 'Checkout session expired')
+        const paymentId = session.metadata?.paymentId
+        await this.paymentsService.markpaymentFailed(paymentId || session.id, 'Checkout session expired')
         break
       }
 
       case 'payment_intent.payment_failed': {
         const intent = event.data.object as Stripe.PaymentIntent
         const errorMsg = intent.last_payment_error?.message || 'Payment intent failed'
-        await this.paymentsService.markpaymentFailed(intent.id, errorMsg)
+        const paymentId = intent.metadata?.paymentId
+        await this.paymentsService.markpaymentFailed(paymentId || intent.id, errorMsg)
         break
       }
 
       case 'checkout.session.async_payment_failed': {
         const session = event.data.object as Stripe.Checkout.Session
-        await this.paymentsService.markpaymentFailed(session.id, 'Async payment failed')
+        const paymentId = session.metadata?.paymentId
+        await this.paymentsService.markpaymentFailed(paymentId || session.id, 'Async payment failed')
         break
       }
 

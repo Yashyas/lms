@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LMS Video Pipeline & Consumption Architecture Plan</title>
+  <title>LMS Video Pipeline &amp; Consumption Architecture</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
@@ -22,6 +22,12 @@
       --tag-bg: #f4f4f5;
       --tag-border: #e4e4e7;
       --code-bg: #f4f4f5;
+      --success: #16a34a;
+      --success-bg: rgba(22, 163, 74, 0.08);
+      --success-border: rgba(22, 163, 74, 0.25);
+      --warning: #d97706;
+      --warning-bg: rgba(217, 119, 6, 0.08);
+      --warning-border: rgba(217, 119, 6, 0.25);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
       --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07);
       --radius: 10px;
@@ -42,6 +48,12 @@
       --tag-bg: #1c1c20;
       --tag-border: #27272a;
       --code-bg: #18181b;
+      --success: #22c55e;
+      --success-bg: rgba(34, 197, 94, 0.1);
+      --success-border: rgba(34, 197, 94, 0.3);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --warning-border: rgba(245, 158, 11, 0.3);
       --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
       --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.5);
     }
@@ -64,7 +76,7 @@
     }
 
     .container {
-      max-width: 1040px;
+      max-width: 1080px;
       margin: 0 auto;
       padding: 0 24px;
     }
@@ -103,7 +115,7 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background-color: var(--text);
+      background-color: var(--success);
     }
 
     h1 {
@@ -117,7 +129,7 @@
     .subtitle {
       color: var(--text-muted);
       font-size: 14.5px;
-      max-width: 760px;
+      max-width: 780px;
       line-height: 1.6;
     }
 
@@ -153,6 +165,46 @@
       width: 38px;
       height: 38px;
       padding: 0;
+    }
+
+    /* Status Grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .status-stat-card {
+      background: var(--surface);
+      border: 1px solid var(--surface-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .status-stat-label {
+      font-size: 11.5px;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .status-stat-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-stat-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
     }
 
     /* Tab Navigation */
@@ -214,6 +266,8 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 18px;
+      flex-wrap: wrap;
+      gap: 12px;
     }
 
     .card-title {
@@ -237,10 +291,22 @@
       font-weight: 500;
     }
 
-    .badge-p0 {
+    .badge-success {
+      background: var(--success-bg);
+      color: var(--success);
+      border-color: var(--success-border);
+    }
+
+    .badge-primary {
       background: var(--accent);
       color: var(--accent-contrast);
       border-color: var(--accent);
+    }
+
+    .badge-warning {
+      background: var(--warning-bg);
+      color: var(--warning);
+      border-color: var(--warning-border);
     }
 
     /* Architecture Flow Graph */
@@ -263,7 +329,7 @@
 
     .arch-icon {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 12px;
+      font-size: 11.5px;
       color: var(--text-muted);
       font-weight: 600;
     }
@@ -338,7 +404,7 @@
     }
 
     .flow-desc {
-      font-size: 13.5px;
+      font-size: 13px;
       color: var(--text-muted);
       line-height: 1.55;
     }
@@ -372,16 +438,16 @@
       padding: 0;
     }
 
-    /* Callout & Note */
     .callout {
-      border: 1px solid var(--surface-border-strong);
       background: var(--surface-subtle);
-      border-left: 3px solid var(--text);
+      border: 1px solid var(--surface-border);
+      border-left: 3px solid var(--accent);
       border-radius: 6px;
       padding: 14px 16px;
-      margin: 16px 0;
       font-size: 13px;
-      line-height: 1.5;
+      color: var(--text);
+      line-height: 1.6;
+      margin: 14px 0;
     }
 
     .callout-title {
@@ -396,7 +462,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 16px 0;
+      margin-top: 12px;
       font-size: 13px;
     }
 
@@ -407,13 +473,11 @@
     }
 
     th {
-      font-weight: 600;
-      color: var(--text-muted);
-      background: var(--surface-subtle);
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 11px;
+      font-size: 11.5px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      color: var(--text-muted);
+      background: var(--surface-subtle);
     }
 
     /* Checklist */
@@ -484,9 +548,20 @@
     }
 
     .check-desc {
-      font-size: 12.5px;
+      font-size: 13px;
       color: var(--text-muted);
-      line-height: 1.5;
+    }
+
+    .check-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--surface-border);
+      background: var(--surface);
+      margin-left: 6px;
+      text-decoration: none !important;
+      display: inline-block;
     }
 
     /* Progress bar */
@@ -501,7 +576,6 @@
     .progress-top {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       font-size: 13px;
       font-weight: 600;
       margin-bottom: 8px;
@@ -529,50 +603,83 @@
       right: 24px;
       background: var(--accent);
       color: var(--accent-contrast);
-      padding: 10px 16px;
+      padding: 12px 18px;
       border-radius: 8px;
       font-size: 13px;
       font-weight: 500;
       box-shadow: var(--shadow-md);
+      transform: translateY(80px);
       opacity: 0;
-      transform: translateY(10px);
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      pointer-events: none;
-      z-index: 999;
+      transition: var(--transition);
+      z-index: 1000;
     }
 
     .toast.visible {
-      opacity: 1;
       transform: translateY(0);
+      opacity: 1;
     }
   </style>
 </head>
 <body>
 
-  <!-- Header -->
   <header>
     <div class="container">
       <div class="header-top">
         <div>
-          <div class="brand-eyebrow">Production LMS Engine &bull; Step 01 &amp; Step 02</div>
-          <h1>Video Pipeline &amp; Consumption Architecture</h1>
-          <p class="subtitle">
-            An industry-grade technical blueprint covering Garage S3 storage, presigned chunked uploads, BullMQ background transcoding, multi-bitrate HLS packaging, AES-128 encryption, secure key gating, and heartbeat progress tracking.
-          </p>
+          <div class="brand-eyebrow">Video Infrastructure &amp; Progress Spec</div>
+          <h1>LMS Video Pipeline &amp; Consumption Architecture</h1>
+          <p class="subtitle">Production media streaming engine: Direct-to-Garage S3 presigned uploads, decoupled BullMQ FFmpeg multi-bitrate ABR transcoding (1080p–360p), AES-128 ClearKey DRM, and real-time heartbeat progress tracking.</p>
         </div>
         <div class="header-actions">
-          <button class="btn theme-toggle" id="themeToggleBtn" title="Toggle Theme" aria-label="Toggle Theme">
-            <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+          <button class="btn theme-toggle" id="themeToggleBtn" title="Toggle Theme">
+            <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
           </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics -->
+      <div class="status-grid">
+        <div class="status-stat-card">
+          <div class="status-stat-label">Transcoding Pipeline</div>
+          <div class="status-stat-value" style="color: var(--success);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Active &amp; Live
+          </div>
+          <div class="status-stat-sub">Multi-bitrate ABR (1080p–360p)</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">Cryptographic DRM</div>
+          <div class="status-stat-value">HLS AES-128</div>
+          <div class="status-stat-sub">ClearKey authenticated endpoint</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">Background Queue</div>
+          <div class="status-stat-value">BullMQ + Redis</div>
+          <div class="status-stat-sub">Isolated CPU worker / no OOM</div>
+        </div>
+        <div class="status-stat-card">
+          <div class="status-stat-label">Progress Engine</div>
+          <div class="status-stat-value">90% Auto-Complete</div>
+          <div class="status-stat-sub">Heartbeats &amp; resume positioning</div>
         </div>
       </div>
 
       <!-- Navigation Tabs -->
       <nav class="tabs-nav">
         <button class="tab-btn active" data-tab="overview">System Architecture</button>
-        <button class="tab-btn" data-tab="step1">Step 1: Storage &amp; Video Pipeline</button>
-        <button class="tab-btn" data-tab="step2">Step 2: Tracking &amp; Consumption</button>
-        <button class="tab-btn" data-tab="schema">Database &amp; ZenStack Delta</button>
+        <button class="tab-btn" data-tab="step1">Storage &amp; Video Pipeline</button>
+        <button class="tab-btn" data-tab="step2">Tracking &amp; Consumption</button>
+        <button class="tab-btn" data-tab="schema">Database &amp; ZenStack Schema</button>
         <button class="tab-btn" data-tab="checklist">Interactive Checklist</button>
       </nav>
     </div>
@@ -584,13 +691,26 @@
     <!-- TAB 1: SYSTEM ARCHITECTURE & FLOW          -->
     <!-- ========================================== -->
     <div class="tab-pane active" id="pane-overview">
+      <div class="card" style="border-left: 4px solid var(--success); background: var(--success-bg); margin-bottom: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+          <strong style="color: var(--success); font-size: 14px; display: flex; align-items: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Complete Video Engine Live in Backend
+          </strong>
+          <span class="badge badge-success">ACTIVE &amp; HARDENED</span>
+        </div>
+        <p style="font-size: 13.5px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+          The video pipeline is fully wired: direct presigned upload URLs bypass Cloudflare Free 100MB limits, BullMQ asynchronous workers transcode video using FFmpeg into AES-128 encrypted HLS chunks, and ZenStack policies guard the binary key delivery endpoint.
+        </p>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">End-to-End System Architecture</h2>
-          <span class="badge badge-p0">Production Standard</span>
+          <span class="badge badge-primary">Industry Standard</span>
         </div>
         <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
-          This architecture mirrors platforms like Udemy and Coursera: large media uploads never bottleneck the API server, compute-heavy transcoding runs in an isolated queue, and video playback is cryptographically secured via HLS AES-128.
+          Mirrors production media platforms (Udemy, Coursera): large media uploads never touch or bottleneck the NestJS API server, compute-heavy transcoding runs in a sandboxed background queue, and playback is cryptographically secured via HLS AES-128 ClearKey encryption.
         </p>
 
         <!-- Components Grid -->
@@ -598,22 +718,22 @@
           <div class="arch-card">
             <span class="arch-icon">01. INGESTION</span>
             <div class="arch-title">Direct-to-S3 Upload</div>
-            <div class="arch-desc">Client uploads raw MP4 directly to Garage S3 via short-lived presigned PUT URLs, bypassing NestJS memory limits.</div>
+            <div class="arch-desc">Instructors stream multi-GB raw MP4s directly into Garage S3 using presigned PUT URLs, bypassing NestJS memory limits.</div>
           </div>
           <div class="arch-card">
             <span class="arch-icon">02. ORCHESTRATION</span>
             <div class="arch-title">BullMQ + Redis Worker</div>
-            <div class="arch-desc">Decoupled queue worker executes CPU-intensive FFmpeg jobs asynchronously with retry and progress reporting.</div>
+            <div class="arch-desc">Decoupled queue worker executes CPU-intensive FFmpeg jobs asynchronously with retry, progress reporting, and cleanup.</div>
           </div>
           <div class="arch-card">
             <span class="arch-icon">03. DRM / SECURITY</span>
             <div class="arch-title">HLS AES-128 Encryptor</div>
-            <div class="arch-desc">FFmpeg slices videos into 6-second chunks encrypted with 16-byte random keys and unique IVs for each lesson.</div>
+            <div class="arch-desc">FFmpeg slices videos into 6-second chunks encrypted with unique 16-byte cryptographic keys and IVs for each lesson.</div>
           </div>
           <div class="arch-card">
             <span class="arch-icon">04. GATED STREAMING</span>
             <div class="arch-title">Key Delivery Server</div>
-            <div class="arch-desc">The player requests decryption keys from NestJS, which verifies user authentication and course enrollment via ZenStack policies.</div>
+            <div class="arch-desc">Player requests decryption keys from NestJS, which verifies user authentication and course enrollment via ZenStack policies.</div>
           </div>
         </div>
 
@@ -622,7 +742,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
             Why AES-128 HLS Over Direct MP4 Streaming?
           </div>
-          Plain MP4 links can be downloaded in 1-click and cannot adapt to changing student bandwidth. Multi-bitrate HLS dynamically switches resolutions (1080p, 720p, 480p, 360p) based on network speed. AES-128 encrypts every <code>.ts</code> segment so intercepted chunks cannot be decrypted without contacting your authorized key endpoint.
+          Plain MP4 links can be ripped in 1-click and cannot adapt to changing student bandwidth. Multi-bitrate HLS dynamically switches resolutions (1080p, 720p, 480p, 360p) based on network speed. AES-128 encrypts every <code>.ts</code> segment so intercepted chunks cannot be played without reaching your authenticated key endpoint.
         </div>
       </div>
 
@@ -638,7 +758,7 @@
             <div class="flow-number">1</div>
             <div class="flow-content">
               <div class="flow-title">Presigned Upload Request</div>
-              <div class="flow-desc">Instructor frontend requests an upload URL for a lesson video. NestJS validates instructor ownership and returns a signed Garage S3 PUT URL for <code>raw-videos/{courseId}/{lessonId}/{uuid}.mp4</code>.</div>
+              <div class="flow-desc">Instructor frontend calls <code>POST /video-asset/upload-url</code>. NestJS validates instructor ownership and returns a signed Garage S3 PUT URL for <code>raw-videos/{lessonId}/{uuid}.mp4</code>.</div>
             </div>
           </div>
 
@@ -646,7 +766,7 @@
             <div class="flow-number">2</div>
             <div class="flow-content">
               <div class="flow-title">Direct Client-to-Garage Upload</div>
-              <div class="flow-desc">Browser streams raw MP4 directly to Garage S3 with progress bar. Once finished, client notifies NestJS <code>POST /api/videos/upload-complete</code>.</div>
+              <div class="flow-desc">Browser streams raw MP4 directly to Garage S3 with a progress bar. Once finished, client notifies NestJS via <code>PATCH /video-asset/:lessonId/upload-complete</code>.</div>
             </div>
           </div>
 
@@ -654,7 +774,7 @@
             <div class="flow-number">3</div>
             <div class="flow-content">
               <div class="flow-title">BullMQ Job Dispatch &amp; Status Transition</div>
-              <div class="flow-desc">NestJS updates lesson video status to <code>PROCESSING</code> and enqueues a job into Redis: <code>{ lessonId, rawKey, courseId }</code>.</div>
+              <div class="flow-desc">NestJS verifies file existence in S3, updates video status to <code>PROCESSING</code>, and enqueues a job into Redis: <code>{ videoAssetId, lessonId, rawStorageKey }</code>.</div>
             </div>
           </div>
 
@@ -662,7 +782,7 @@
             <div class="flow-number">4</div>
             <div class="flow-content">
               <div class="flow-title">FFmpeg Transcoding, Segmenting &amp; AES-128 Encryption</div>
-              <div class="flow-desc">Worker pulls job, downloads raw video to temp directory, creates a 16-byte random key &amp; IV, runs FFmpeg to generate adaptive ABR streams (1080p, 720p, 480p) + <code>master.m3u8</code> + encrypted <code>.ts</code> chunks, and uploads them to <code>hls/{lessonId}/</code> in Garage S3.</div>
+              <div class="flow-desc">Worker pulls job, downloads raw video to temp directory, probes dimensions, creates 16-byte random key &amp; IV, runs FFmpeg to generate adaptive ABR streams (1080p, 720p, 480p, 360p) + <code>master.m3u8</code> + encrypted <code>.ts</code> chunks, and streams them into <code>hls/{lessonId}/</code> in Garage S3.</div>
             </div>
           </div>
 
@@ -670,7 +790,7 @@
             <div class="flow-number">5</div>
             <div class="flow-content">
               <div class="flow-title">Secure Playback &amp; Key Gating</div>
-              <div class="flow-desc">Enrolled student opens lesson. The video player fetches <code>master.m3u8</code>. When it reaches <code>#EXT-X-KEY:METHOD=AES-128,URI="/api/videos/:id/key"</code>, the browser requests the key. NestJS verifies enrollment via ZenStack and returns the raw 16-byte binary key.</div>
+              <div class="flow-desc">Enrolled student opens lesson. The video player fetches <code>master.m3u8</code>. When reaching <code>#EXT-X-KEY:METHOD=AES-128,URI="/api/videos/:id/key"</code>, the browser requests the key. NestJS verifies enrollment via ZenStack and returns the raw 16-byte binary key with <code>no-store</code> headers.</div>
             </div>
           </div>
 
@@ -678,7 +798,7 @@
             <div class="flow-number">6</div>
             <div class="flow-content">
               <div class="flow-title">Heartbeat Progress Tracking &amp; Auto-Completion</div>
-              <div class="flow-desc">Every 10 seconds of playback, the player pings <code>POST /api/lessons/:id/heartbeat</code> with current playback timestamp. When the student reaches 90% duration, the lesson is automatically marked as <code>completed: true</code>.</div>
+              <div class="flow-desc">During playback, the player emits throttled heartbeats to <code>POST /lesson-progress/heartbeat/:lessonId</code>. When student reaches $\ge 90\%$ duration, the lesson is automatically marked as <code>completed: true</code>.</div>
             </div>
           </div>
         </div>
@@ -694,33 +814,29 @@
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">1.1 Garage S3 &amp; Redis Infrastructure Setup</h2>
-          <span class="badge badge-p0">P0 &bull; Infra</span>
+          <span class="badge badge-success">Containers Live</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Garage is a lightweight, distributed, S3-compatible object storage daemon running directly in Docker on port 3900 (S3 API) and port 3903 (Admin).
+          Garage is a lightweight, distributed, S3-compatible object storage daemon running directly in Docker on port 3900 (S3 API) and port 3903 (Admin), with Redis running on port 6379.
         </p>
 
-        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">Start Containers &amp; Initialize Garage S3</div>
+        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">Container Commands</div>
         <pre><code># 1. Start containers in detached mode
 docker compose up -d redis garage
 
 # 2. Check garage status and node ID
 docker exec -it lms-garage /garage status
 
-# 3. Create the S3 media bucket
+# 3. Create media bucket and keys
 docker exec -it lms-garage /garage bucket create lms-media
-
-# 4. Create an S3 access key pair for NestJS
 docker exec -it lms-garage /garage key create lms-app-key
-
-# 5. Grant read/write permissions to the bucket
 docker exec -it lms-garage /garage bucket allow --read --write --key lms-app-key lms-media</code></pre>
 
-        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">Add S3 &amp; Redis Keys to <code>.env</code></div>
+        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">Environment Variables (.env)</div>
         <pre><code># Storage & S3 Configuration (Garage S3)
 S3_ENDPOINT=http://localhost:3900
 S3_REGION=garage
-S3_ACCESS_KEY=&lt;generated_access_key_id&gt;
+S3_ACCESS_KEY=&lt;generated_access_key&gt;
 S3_SECRET_KEY=&lt;generated_secret_key&gt;
 S3_BUCKET=lms-media
 S3_FORCE_PATH_STYLE=true
@@ -734,188 +850,151 @@ REDIS_PORT=6379</code></pre>
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">1.2 NestJS StorageModule with Presigned URLs</h2>
-          <span class="badge badge-p0">P0 &bull; Backend</span>
+          <span class="badge badge-success">Implemented</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Create <code>backend/src/storage/storage.service.ts</code> using AWS SDK v3 (<code>@aws-sdk/client-s3</code> and <code>@aws-sdk/s3-request-presigner</code>).
+          Implemented in <code>backend/src/storage/storage.service.ts</code> using AWS SDK v3 with custom methods for presigned uploads, verification, and chunk streaming:
         </p>
 
-        <pre><code>import { Injectable } from '@nestjs/common';
-import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-
-@Injectable()
-export class StorageService {
-  private readonly s3: S3Client;
-  private readonly bucket: string;
-
-  constructor() {
-    this.bucket = process.env.S3_BUCKET || 'lms-media';
-    this.s3 = new S3Client({
-      endpoint: process.env.S3_ENDPOINT || 'http://localhost:3900',
-      region: process.env.S3_REGION || 'garage',
-      credentials: {
-        accessKeyId: process.env.S3_ACCESS_KEY!,
-        secretAccessKey: process.env.S3_SECRET_KEY!,
-      },
-      forcePathStyle: true, // Required for self-hosted S3 / Garage
-    });
-  }
-
-  // Generate short-lived presigned URL for direct browser uploads
-  async getPresignedUploadUrl(key: string, contentType: string, expiresIn = 900) {
-    const command = new PutObjectCommand({
-      Bucket: this.bucket,
-      Key: key,
-      ContentType: contentType,
-    });
-    return getSignedUrl(this.s3, command, { expiresIn });
-  }
-
-  // Stream video chunks or download files in background worker
-  async getObjectStream(key: string) {
-    const command = new GetObjectCommand({ Bucket: this.bucket, Key: key });
-    const response = await this.s3.send(command);
-    return response.Body as NodeJS.ReadableStream;
-  }
-}</code></pre>
+        <pre><code>// Methods implemented in backend/src/storage/storage.service.ts:
+getUploadPresignedUrl(key: string, contentType: string, expiresIn?: number, contentLength?: number): Promise&lt;string&gt;
+getViewPresignedUrl(key: string, expiresIn?: number): Promise&lt;string&gt;
+getPublicUrl(key: string): string
+getKeyFromUrl(url: string): string | null
+verifyUploadedObject(key: string, maxSizeBytes?: number, allowedMimes?: string[]): Promise&lt;boolean&gt;
+getRawVideo(key: string): Promise&lt;Readable&gt;
+uploadFile(key: string, fileContent: Buffer | string, contentType: string): Promise&lt;void&gt;
+deleteFile(key: string): Promise&lt;void&gt;
+deleteVideoChunks(hlsFolderPrefix: string): Promise&lt;void&gt;</code></pre>
       </div>
 
       <!-- BullMQ Transcoder Worker -->
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">1.3 BullMQ Transcoder Queue &amp; FFmpeg HLS Worker</h2>
-          <span class="badge badge-p0">P0 &bull; Processing</span>
+          <span class="badge badge-success">Implemented</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          The worker pulls jobs from Redis, executes FFmpeg to segment videos into 6-second encrypted chunks with multi-resolution renditions, and uploads the output to Garage S3.
+          The worker in <code>backend/src/video-asset/video-transcode.processor.ts</code> executes FFmpeg to segment videos into 6-second AES-128 encrypted chunks with an adaptive ABR ladder.
         </p>
 
-        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">Multi-Bitrate ABR Ladder Specifications</div>
+        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-bottom: 6px;">Adaptive ABR Ladder Ladder (Dynamic Scaling)</div>
         <table>
           <thead>
             <tr>
               <th>Rendition</th>
-              <th>Resolution</th>
-              <th>Video Bitrate</th>
+              <th>Dimensions</th>
+              <th>Profile / Level</th>
+              <th>CRF / Maxrate</th>
               <th>Audio Bitrate</th>
-              <th>Ideal Network</th>
             </tr>
           </thead>
           <tbody>
             <tr>
               <td><code>1080p</code></td>
               <td>1920 &times; 1080</td>
-              <td>4500 kbps</td>
-              <td>192 kbps</td>
-              <td>High-speed Fiber / 5G</td>
+              <td>high / 4.1</td>
+              <td>CRF 22 (Max 3000k)</td>
+              <td>128 kbps</td>
             </tr>
             <tr>
               <td><code>720p</code></td>
               <td>1280 &times; 720</td>
-              <td>2500 kbps</td>
+              <td>high / 3.1</td>
+              <td>CRF 23 (Max 1500k)</td>
               <td>128 kbps</td>
-              <td>Standard Broadband / 4G</td>
             </tr>
             <tr>
               <td><code>480p</code></td>
               <td>854 &times; 480</td>
-              <td>1000 kbps</td>
+              <td>main / 3.1</td>
+              <td>CRF 23 (Max 800k)</td>
               <td>96 kbps</td>
-              <td>Mobile 3G / Poor WiFi</td>
             </tr>
             <tr>
               <td><code>360p</code></td>
               <td>640 &times; 360</td>
-              <td>600 kbps</td>
+              <td>main / 3.0</td>
+              <td>CRF 24 (Max 400k)</td>
               <td>64 kbps</td>
-              <td>Ultra-low Latency / Edge</td>
             </tr>
           </tbody>
         </table>
 
-        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">FFmpeg AES-128 Encryption Command &amp; Keyinfo Structure</div>
-        <pre><code># enc.keyinfo format (3 lines):
-# Line 1: Decryption key URL embedded in the m3u8 playlist
+        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">AES-128 Keyinfo File Structure</div>
+        <pre><code># enc.keyinfo format (3 lines created dynamically in workDir):
+# Line 1: Decryption key URL embedded in .m3u8 playlist
+/api/videos/{lessonId}/key
+
 # Line 2: Path to the local 16-byte raw key binary for ffmpeg to read
+/tmp/jobs/{jobId}/enc.key
+
 # Line 3: Hexadecimal initialization vector (IV)
-
-https://api.yourlms.com/api/videos/{lessonId}/key
-/tmp/jobs/{jobId}/secret.key
-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
-
-# FFmpeg Command for HLS AES-128 Segmenting:
-ffmpeg -i input.mp4 \
-  -preset veryfast -g 48 -sc_threshold 0 \
-  -hls_time 6 \
-  -hls_playlist_type vod \
-  -hls_key_info_file /tmp/jobs/{jobId}/enc.keyinfo \
-  -hls_segment_filename "/tmp/output/segment_%03d.ts" \
-  /tmp/output/index.m3u8</code></pre>
+7c3a8e91402df9175402bd0ca4fe419c</code></pre>
       </div>
 
       <!-- Empirical Benchmarks & VPS Optimization -->
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">1.3.1 Empirical Benchmarks &amp; Hostinger VPS Tuning</h2>
-          <span class="badge" style="background: rgba(34, 197, 94, 0.1); color: #16a34a; border-color: rgba(34, 197, 94, 0.2);">VERIFIED LIVE</span>
+          <span class="badge badge-success">Verified Live</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Empirical measurements performed on real programming lecture video (<code>Week 10.2 - Prisma ORM.mp4</code>, 1.04 GB, 7,436s, 1920x1080) to evaluate preset efficiency and host safety on a 4 vCPU shared VPS (AMD EPYC 7543P).
+          Empirical measurements performed on real lecture video (<code>Week 10.2 - Prisma ORM.mp4</code>, 1.04 GB, 7,436s, 1920&times;1080) on a 4 vCPU VPS (AMD EPYC 7543P).
         </p>
 
         <div style="overflow-x: auto; margin-bottom: 16px;">
-          <table style="width: 100%; font-size: 13px; border-collapse: collapse; text-align: left;">
+          <table>
             <thead>
-              <tr style="border-bottom: 1px solid var(--surface-border); background: var(--surface-subtle);">
-                <th style="padding: 8px 12px;">Preset</th>
-                <th style="padding: 8px 12px;">60s Slice Size</th>
-                <th style="padding: 8px 12px;">Encode Time</th>
-                <th style="padding: 8px 12px;">Transcode Speed</th>
-                <th style="padding: 8px 12px;">Full 2h Est. Package</th>
-                <th style="padding: 8px 12px;">Full 2h Encode Time</th>
+              <tr>
+                <th>Preset</th>
+                <th>60s Slice Size</th>
+                <th>Encode Time</th>
+                <th>Transcode Speed</th>
+                <th>Full 2h Package Est.</th>
+                <th>Full 2h Encode Time</th>
               </tr>
             </thead>
             <tbody>
-              <tr style="border-bottom: 1px solid var(--surface-border); background: rgba(34, 197, 94, 0.05); font-weight: 600;">
-                <td style="padding: 8px 12px;">veryfast (Selected)</td>
-                <td style="padding: 8px 12px;">2.69 MB</td>
-                <td style="padding: 8px 12px;">26.8s</td>
-                <td style="padding: 8px 12px;">~2.2x</td>
-                <td style="padding: 8px 12px;">~780 MB</td>
-                <td style="padding: 8px 12px;">~1h 40m</td>
-              </tr>
-              <tr style="border-bottom: 1px solid var(--surface-border);">
-                <td style="padding: 8px 12px;">fast</td>
-                <td style="padding: 8px 12px;">3.05 MB (+13%)</td>
-                <td style="padding: 8px 12px;">49.4s</td>
-                <td style="padding: 8px 12px;">~1.2x</td>
-                <td style="padding: 8px 12px;">~880 MB</td>
-                <td style="padding: 8px 12px;">~3h 30m</td>
-              </tr>
-              <tr style="border-bottom: 1px solid var(--surface-border);">
-                <td style="padding: 8px 12px;">medium</td>
-                <td style="padding: 8px 12px;">3.13 MB (+16%)</td>
-                <td style="padding: 8px 12px;">47.2s</td>
-                <td style="padding: 8px 12px;">~1.2x</td>
-                <td style="padding: 8px 12px;">~910 MB</td>
-                <td style="padding: 8px 12px;">~3h 45m</td>
-              </tr>
-              <tr style="border-bottom: 1px solid var(--surface-border);">
-                <td style="padding: 8px 12px;">superfast</td>
-                <td style="padding: 8px 12px;">4.42 MB (+64%)</td>
-                <td style="padding: 8px 12px;">22.5s</td>
-                <td style="padding: 8px 12px;">~2.7x</td>
-                <td style="padding: 8px 12px;">~1,280 MB</td>
-                <td style="padding: 8px 12px;">~1h 25m</td>
+              <tr style="background: rgba(34, 197, 94, 0.05); font-weight: 600;">
+                <td><strong>veryfast (Selected)</strong></td>
+                <td>2.69 MB</td>
+                <td>26.8s</td>
+                <td>~2.2x</td>
+                <td>~780 MB</td>
+                <td>~1h 40m</td>
               </tr>
               <tr>
-                <td style="padding: 8px 12px;">ultrafast</td>
-                <td style="padding: 8px 12px;">8.23 MB (+205%)</td>
-                <td style="padding: 8px 12px;">16.0s</td>
-                <td style="padding: 8px 12px;">~3.7x</td>
-                <td style="padding: 8px 12px;">~2,380 MB</td>
-                <td style="padding: 8px 12px;">~1h 00m</td>
+                <td>fast</td>
+                <td>3.05 MB (+13%)</td>
+                <td>49.4s</td>
+                <td>~1.2x</td>
+                <td>~880 MB</td>
+                <td>~3h 30m</td>
+              </tr>
+              <tr>
+                <td>medium</td>
+                <td>3.13 MB (+16%)</td>
+                <td>47.2s</td>
+                <td>~1.2x</td>
+                <td>~910 MB</td>
+                <td>~3h 45m</td>
+              </tr>
+              <tr>
+                <td>superfast</td>
+                <td>4.42 MB (+64%)</td>
+                <td>22.5s</td>
+                <td>~2.7x</td>
+                <td>~1,280 MB</td>
+                <td>~1h 25m</td>
+              </tr>
+              <tr>
+                <td>ultrafast</td>
+                <td>8.23 MB (+205%)</td>
+                <td>16.0s</td>
+                <td>~3.7x</td>
+                <td>~2,380 MB</td>
+                <td>~1h 00m</td>
               </tr>
             </tbody>
           </table>
@@ -927,8 +1006,8 @@ ffmpeg -i input.mp4 \
             Production VPS Safeguards (Hostinger 4 vCPU KVM)
           </div>
           <ul style="margin: 6px 0 0 18px; font-size: 13px; color: var(--text-muted); line-height: 1.6;">
-            <li><strong>75% CPU Rule (<code>nice -n 10 -threads 3</code>):</strong> Prevents host hypervisor CPU steal penalties (&gt;50% throttling) and false cryptomining alerts, leaving 1 vCPU dedicated to Postgres, Redis, and Next.js.</li>
-            <li><strong>Persistent Disk Cache:</strong> Configured <code>TRANSCODE_CACHE_DIR</code> to avoid Linux Fedora's 3.8 GB <code>tmpfs</code> RAM disk exhaustion (<code>ENOSPC</code>) during multi-gigabyte 1080p transcodes.</li>
+            <li><strong>75% CPU Rule:</strong> Caps FFmpeg threads to leave 1 vCPU dedicated to PostgreSQL, Redis, and Next.js, preventing hypervisor CPU-steal penalties.</li>
+            <li><strong>Persistent Disk Cache:</strong> Configured <code>TRANSCODE_CACHE_DIR</code> to use persistent disk instead of Linux <code>tmpfs</code> RAM disks to prevent <code>ENOSPC</code> errors during multi-gigabyte transcodes.</li>
           </ul>
         </div>
       </div>
@@ -937,42 +1016,30 @@ ffmpeg -i input.mp4 \
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">1.4 Secure AES-128 Key Delivery Endpoint</h2>
-          <span class="badge badge-p0">P0 &bull; Security</span>
+          <span class="badge badge-success">Implemented</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          When an HLS player reads <code>#EXT-X-KEY:METHOD=AES-128,URI="..."</code>, it requests the key. The endpoint returns the raw 16-byte buffer only after verifying student enrollment or free-lesson status.
+          When an HLS player reads <code>#EXT-X-KEY:METHOD=AES-128,URI="..."</code>, it requests the key. The endpoint returns the raw 16-byte binary buffer under strict authorization checks.
         </p>
 
-        <pre><code>@Controller('videos')
-export class VideoKeyController {
-  constructor(private readonly db: DbPoolService) {}
+        <pre><code>// GET /api/videos/:lessonId/key or /videos/:lessonId/key
+@Get(':lessonId/key')
+@AllowAnonymous()
+async getKey(
+  @Param('lessonId') lessonId: string,
+  @Session() session: UserSession | undefined,
+  @Res() res: Response,
+) {
+  // Authoritatively verifies:
+  // 1. If lesson is marked isFree -> allow access
+  // 2. If student is enrolled in the parent course -> allow access
+  // 3. If user is course instructor or admin -> allow access
+  const keyBuffer = await this.videoAssetService.getVideoKey(lessonId, session?.user);
 
-  @Get(':lessonId/key')
-  async getKey(
-    @Param('lessonId') lessonId: string,
-    @Session() session: UserSession,
-    @Res() res: Response
-  ) {
-    // 1. Fetch lesson via ZenStack policy client for current user
-    const lesson = await this.db.forUser(session?.user).lesson.findUnique({
-      where: { id: lessonId },
-      include: { videoAsset: true }
-    });
-
-    // 2. ZenStack policy automatically throws 403 / returns null if not enrolled or not free
-    if (!lesson || !lesson.videoAsset?.encryptionKey) {
-      throw new ForbiddenException('You are not authorized to view this video');
-    }
-
-    // 3. Convert stored hex key to 16-byte binary buffer
-    const keyBuffer = Buffer.from(lesson.videoAsset.encryptionKey, 'hex');
-
-    // 4. Return binary buffer with strict caching headers
-    res.setHeader('Content-Type', 'application/octet-stream');
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
-    res.setHeader('Content-Length', keyBuffer.length);
-    return res.end(keyBuffer);
-  }
+  res.setHeader('Content-Type', 'application/octet-stream');
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Content-Length', keyBuffer.length);
+  return res.end(keyBuffer);
 }</code></pre>
       </div>
     </div>
@@ -986,43 +1053,46 @@ export class VideoKeyController {
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">2.1 Heartbeat Playback Tracking Engine</h2>
-          <span class="badge badge-p0">P0 &bull; Consumption</span>
+          <span class="badge badge-success">Implemented</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          While a student watches a lesson, the frontend player emits a throttled heartbeat ping every 10 seconds. This updates their last played position and automatically triggers completion once the progress threshold is reached.
+          While a student watches a lesson, the frontend player emits a throttled heartbeat ping. Implemented in <code>backend/src/lesson-progress/lesson-progress.service.ts</code>:
         </p>
 
-        <pre><code>// POST /api/lessons/:id/heartbeat
-// Request Body: { currentSeconds: 145, durationSeconds: 600 }
+        <pre><code>// POST /lesson-progress/heartbeat/:lessonId
+// Request Body: { lastPlayedSecond: 145, duration: 600 }
 
-@Injectable()
-export class ProgressService {
-  constructor(private readonly db: DbPoolService) {}
+async recordHeartbeat(recordHeartbeatDto: RecordHeartbeatDto, user: AuthUser, lessonId: string) {
+  const lesson = await this.db.forUser(user).lesson.findUnique({
+    where: { id: lessonId },
+    select: { id: true, courseId: true },
+  });
 
-  async recordHeartbeat(lessonId: string, currentSeconds: number, durationSeconds: number, user: AuthUser) {
-    const COMPLETION_THRESHOLD = 0.90; // 90% watched marks as completed
-    const shouldMarkCompleted = (currentSeconds / durationSeconds) >= COMPLETION_THRESHOLD;
-
-    return await this.db.forUser(user).lessonProgress.upsert({
-      where: {
-        userId_lessonId: { userId: user.id, lessonId }
-      },
-      create: {
-        userId: user.id,
-        lessonId,
-        lastPlayedSeconds: Math.floor(currentSeconds),
-        durationSeconds: Math.floor(durationSeconds),
-        completed: shouldMarkCompleted,
-        completedAt: shouldMarkCompleted ? new Date() : null,
-      },
-      update: {
-        lastPlayedSeconds: Math.floor(currentSeconds),
-        durationSeconds: Math.floor(durationSeconds),
-        // Once marked completed, keep it completed
-        ...(shouldMarkCompleted ? { completed: true, completedAt: new Date() } : {})
-      }
-    });
+  if (!lesson) {
+    throw new NotFoundException('Lesson not found or you are not enrolled');
   }
+
+  // Check 90% completion threshold
+  const COMPLETION_THRESHOLD = 0.90;
+  const shouldMarkCompleted =
+    recordHeartbeatDto.duration > 0 &amp;&amp;
+    recordHeartbeatDto.lastPlayedSecond / recordHeartbeatDto.duration >= COMPLETION_THRESHOLD;
+
+  // Upsert progress (never un-complete an already completed lesson)
+  return await this.db.forUser(user).lessonProgress.upsert({
+    where: { userId_lessonId: { userId: user.id, lessonId } },
+    create: {
+      userId: user.id,
+      lessonId,
+      lastPlayedSeconds: Math.floor(recordHeartbeatDto.lastPlayedSecond),
+      completed: shouldMarkCompleted,
+      completedAt: shouldMarkCompleted ? new Date() : null,
+    },
+    update: {
+      lastPlayedSeconds: Math.floor(recordHeartbeatDto.lastPlayedSecond),
+      ...(shouldMarkCompleted ? { completed: true, completedAt: new Date() } : {}),
+    },
+  });
 }</code></pre>
       </div>
 
@@ -1030,47 +1100,40 @@ export class ProgressService {
       <div class="card">
         <div class="card-header">
           <h2 class="card-title">2.2 Course Completion &amp; Progress Aggregation</h2>
-          <span class="badge badge-p1">P1 &bull; Analytics</span>
+          <span class="badge badge-success">Implemented</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Calculate overall course completion percentage, total lessons watched, and identify the next unwatched lesson for a seamless "Continue Learning" UX.
+          Calculates overall completion percentage and determines the next unwatched lesson for a seamless "Continue Learning" UX.
         </p>
 
-        <pre><code>// GET /api/courses/:courseId/progress
-@Get(':courseId/progress')
-async getCourseProgress(@Param('courseId') courseId: string, @Session() session: UserSession) {
-  const user = session.user;
-
-  // 1. Fetch total lessons in course
+        <pre><code>// GET /lesson-progress/course/:courseId/progress
+async getCourseProgress(courseId: string, user: AuthUser) {
   const lessons = await this.db.forUser(user).lesson.findMany({
     where: { courseId },
     orderBy: { position: 'asc' },
-    select: { id: true, title: true, position: true }
+    select: { id: true, position: true },
   });
 
-  // 2. Fetch completed lesson IDs for this user
-  const progressRecords = await this.db.forUser(user).lessonProgress.findMany({
+  const progress = await this.db.forUser(user).lessonProgress.findMany({
     where: {
       lessonId: { in: lessons.map(l => l.id) },
-      completed: true
+      completed: true,
     },
-    select: { lessonId: true }
+    select: { lessonId: true },
   });
 
-  const completedSet = new Set(progressRecords.map(p => p.lessonId));
+  const completedLessonIds = new Set(progress.map(p => p.lessonId));
   const total = lessons.length;
-  const completed = progressRecords.length;
+  const completed = progress.length;
   const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
-
-  // 3. Find first unwatched lesson
-  const nextLesson = lessons.find(l => !completedSet.has(l.id)) || lessons[0];
+  const nextLesson = lessons.find(l => !completedLessonIds.has(l.id)) || lessons[0];
 
   return {
+    courseId,
+    completedLessons: progress.map(p => p.lessonId),
     totalLessons: total,
-    completedLessons: completed,
     percentage,
-    isCourseCompleted: percentage === 100,
-    nextLessonId: nextLesson?.id ?? null
+    nextLessonId: nextLesson?.id ?? null,
   };
 }</code></pre>
       </div>
@@ -1078,11 +1141,11 @@ async getCourseProgress(@Param('courseId') courseId: string, @Session() session:
       <!-- Frontend Player Integration -->
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">2.3 Frontend Player Setup (Hls.js + Token Auth)</h2>
-          <span class="badge badge-p0">P0 &bull; Frontend</span>
+          <h2 class="card-title">2.3 Frontend Player Setup (Hls.js + Cookie Auth)</h2>
+          <span class="badge badge-primary">Frontend Spec</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Next.js integration snippet using <code>hls.js</code>. It intercepts AES-128 key requests to attach the session cookie/Bearer token and sends 10-second heartbeats.
+          Next.js integration snippet using <code>hls.js</code>. It enables cookies so the AES-128 key request is authenticated and sends heartbeats.
         </p>
 
         <pre><code>import Hls from 'hls.js';
@@ -1097,8 +1160,8 @@ export function LessonVideoPlayer({ masterPlaylistUrl, lessonId, initialTime = 0
 
     if (Hls.isSupported()) {
       const hls = new Hls({
-        // Attach credentials/cookies so the key request can be authorized
-        xhrSetup: (xhr, url) => {
+        // Sends session cookies with .m3u8, .ts, and /key requests
+        xhrSetup: (xhr) => {
           xhr.withCredentials = true; 
         }
       });
@@ -1107,20 +1170,20 @@ export function LessonVideoPlayer({ masterPlaylistUrl, lessonId, initialTime = 0
       hls.attachMedia(video);
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        // Resume playback from last saved timestamp
         if (initialTime > 0) video.currentTime = initialTime;
       });
 
-      // Heartbeat every 10 seconds
+      // Heartbeat every 30-60 seconds
       let lastPing = 0;
       const onTimeUpdate = () => {
         const now = Math.floor(video.currentTime);
-        if (now - lastPing >= 10 && video.duration) {
+        if (now - lastPing >= 30 &amp;&amp; video.duration) {
           lastPing = now;
-          fetch(`/api/lessons/${lessonId}/heartbeat`, {
+          fetch(`/lesson-progress/heartbeat/${lessonId}`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ currentSeconds: now, durationSeconds: Math.floor(video.duration) })
+            body: JSON.stringify({ lastPlayedSecond: now, duration: Math.floor(video.duration) })
           });
         }
       };
@@ -1144,79 +1207,58 @@ export function LessonVideoPlayer({ masterPlaylistUrl, lessonId, initialTime = 0
     <div class="tab-pane" id="pane-schema">
       <div class="card">
         <div class="card-header">
-          <h2 class="card-title">Schema Delta in packages/db/zenstack/schema.zmodel</h2>
-          <span class="badge badge-p0">ZMODEL</span>
+          <h2 class="card-title">Production schema.zmodel Definition</h2>
+          <span class="badge badge-success">Applied via ZenStack</span>
         </div>
         <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 14px;">
-          Add the dedicated <code>VideoAsset</code> and <code>LessonProgress</code> models with declarative ZenStack access policies.
+          The exact models and relations currently deployed in <code>packages/db/zenstack/schema.zmodel</code>:
         </p>
 
-        <pre><code>// 1. Update User model to include lesson progress relation
-model User {
-    // ... existing fields ...
-    lessonProgress LessonProgress[]
-}
-
-// 2. Video processing states
-enum VideoStatus {
+        <pre><code>enum VideoStatus {
     PENDING_UPLOAD
     PROCESSING
     READY
     FAILED
 }
 
-// 3. Dedicated VideoAsset Model
 model VideoAsset {
-    id              String       @id @default(cuid())
-    lessonId        String       @unique
-    lesson          Lesson       @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-    status          VideoStatus  @default(PENDING_UPLOAD)
-    rawStorageKey   String?
-    hlsMasterUrl    String?
-    durationSeconds Int          @default(0)
-    encryptionKey   String?      // 16-byte AES key in hex (backend-only)
-    encryptionIv    String?      // 16-byte IV in hex
-    errorMessage    String?
-    createdAt       DateTime     @default(now())
-    updatedAt       DateTime     @updatedAt
+    id                  String          @id @default(cuid())
+    status              VideoStatus     @default(PENDING_UPLOAD)
+    lessonId            String          @unique
+    lesson              Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+    rawStorageKey       String?
+    hlsMasterUrl        String?
+    durationSeconds     Int             @default(0)
+    encryptionKey       String?         // 16-byte AES key (hex)
+    encryptionIv        String?         // 16-byte IV (hex)
+    errorMessage        String?
+    createdAt           DateTime        @default(now())
+    updatedAt           DateTime        @updatedAt
 
-    // Encryption key is readable by admin or internal worker
-    @@allow('all', auth().role == 'admin' || lesson.course.instructorId == auth().id)
+    // Encryption key is protected from public/student queries
+    @@allow('all', auth().id == lesson.course.instructorId || auth().role == 'admin')
     @@map('video_asset')
 }
 
-// 4. Update Lesson model
-model Lesson {
-    // ... existing fields ...
-    videoAsset      VideoAsset?
-    progress        LessonProgress[]
-}
-
-// 5. LessonProgress Model (Student tracking)
 model LessonProgress {
-    id                String    @id @default(cuid())
-    userId            String    @default(auth().id)
-    user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    lessonId          String
-    lesson            Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-    lastPlayedSeconds Int       @default(0)
-    durationSeconds   Int       @default(0)
-    completed         Boolean   @default(false)
-    completedAt       DateTime?
-    updatedAt         DateTime  @updatedAt
+    id                  String      @id @default(cuid())
+    userId              String      @default(auth().id)
+    user                User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+    lessonId            String
+    lesson              Lesson      @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+    lastPlayedSeconds   Int         @default(0)
+    completed           Boolean     @default(false)
+    completedAt         DateTime?   
+    createdAt           DateTime    @default(now())
+    updatedAt           DateTime    @updatedAt
 
-    @@unique([userId, lessonId])
+    // ZenStack RLS: Student owns progress; instructor has read visibility
     @@allow('read,create,update', auth().id == userId || auth().role == 'admin')
     @@allow('read', lesson.course.instructorId == auth().id)
+
+    @@unique([userId, lessonId])
     @@map('lesson_progress')
 }</code></pre>
-
-        <div class="callout-title" style="font-size: 13px; font-weight: 600; margin-top: 14px; margin-bottom: 6px;">Schema Push &amp; Client Regeneration</div>
-        <pre><code># Generate ZenStack policies and compile TypeScript client
-pnpm generate
-
-# Push DDL changes to PostgreSQL
-pnpm db:push</code></pre>
       </div>
     </div>
 
@@ -1229,10 +1271,10 @@ pnpm db:push</code></pre>
       <div class="progress-wrap">
         <div class="progress-top">
           <span>Execution Roadmap Progress</span>
-          <span id="progressText">55% Complete (11 / 20 tasks)</span>
+          <span id="progressText">90% Complete (18 / 20 tasks)</span>
         </div>
         <div class="progress-bar-track">
-          <div class="progress-bar-fill" id="progressFill" style="width: 55%;"></div>
+          <div class="progress-bar-fill" id="progressFill" style="width: 90%;"></div>
         </div>
       </div>
 
@@ -1240,84 +1282,84 @@ pnpm db:push</code></pre>
       <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 24px;">
         <div style="padding: 16px 20px; background: var(--surface-subtle); border-bottom: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
           <strong style="font-size: 14px;">Phase 1: Storage &amp; Video Transcoding Pipeline</strong>
-          <span class="badge badge-p0">Step 1</span>
+          <span class="badge badge-success">11 / 11 Complete</span>
         </div>
         <ul class="checklist">
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-1" checked>
             <div class="check-label-wrap">
-              <label for="c-1-1" class="check-title">Start Redis &amp; Garage S3 Containers</label>
+              <label for="c-1-1" class="check-title">Start Redis &amp; Garage S3 Containers <span class="check-tag">INFRA</span></label>
               <span class="check-desc">Run <code>docker compose up -d redis garage</code> and verify ports 3900, 3903, and 6379 are listening.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-2" checked>
             <div class="check-label-wrap">
-              <label for="c-1-2" class="check-title">Initialize Garage Layout &amp; Create S3 Bucket</label>
-              <span class="check-desc">Run Garage CLI inside container: create <code>lms-media</code> bucket, generate S3 key pair, and set read/write permissions.</span>
+              <label for="c-1-2" class="check-title">Initialize Garage Layout &amp; Create S3 Bucket <span class="check-tag">INFRA</span></label>
+              <span class="check-desc">Run Garage CLI: create <code>lms-media</code> bucket, generate S3 key pair, and set read/write permissions.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-3" checked>
             <div class="check-label-wrap">
-              <label for="c-1-3" class="check-title">Update .env with Garage S3 Credentials</label>
-              <span class="check-desc">Add <code>S3_ENDPOINT</code>, <code>S3_ACCESS_KEY</code>, <code>S3_SECRET_KEY</code>, and <code>S3_BUCKET</code> to local environment.</span>
+              <label for="c-1-3" class="check-title">Update .env with Garage S3 Credentials <span class="check-tag">CONFIG</span></label>
+              <span class="check-desc">Add <code>S3_ENDPOINT</code>, <code>S3_ACCESS_KEY</code>, <code>S3_SECRET_KEY</code>, and <code>S3_BUCKET</code> to environment.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-4" checked>
             <div class="check-label-wrap">
-              <label for="c-1-4" class="check-title">Update schema.zmodel with VideoAsset Model</label>
-              <span class="check-desc">Add <code>VideoAsset</code> and <code>VideoStatus</code> enum to <code>packages/db/zenstack/schema.zmodel</code>. Run <code>pnpm generate</code> &amp; <code>pnpm db:push</code>.</span>
+              <label for="c-1-4" class="check-title">Update schema.zmodel with VideoAsset Model <span class="check-tag">SCHEMA</span></label>
+              <span class="check-desc">Defined <code>VideoAsset</code> and <code>VideoStatus</code> enum with instructor/admin policy guards.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-5" checked>
             <div class="check-label-wrap">
-              <label for="c-1-5" class="check-title">Create NestJS StorageModule with AWS SDK v3</label>
-              <span class="check-desc">Implement <code>StorageService</code> with <code>getPresignedUploadUrl</code> and S3 client configuration for Garage.</span>
+              <label for="c-1-5" class="check-title">Create NestJS StorageModule with AWS SDK v3 <span class="check-tag">BACKEND</span></label>
+              <span class="check-desc">Implemented <code>StorageService</code> with presigned URLs, S3 stream reading, and file deletion.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-6" checked>
             <div class="check-label-wrap">
-              <label for="c-1-6" class="check-title">Build Presigned Upload Endpoint</label>
-              <span class="check-desc">Implement <code>POST /api/videos/upload-url</code> checking instructor ownership before returning signed PUT URL.</span>
+              <label for="c-1-6" class="check-title">Build Presigned Upload Endpoint <span class="check-tag">ENDPOINT</span></label>
+              <span class="check-desc">Implemented <code>POST /video-asset/upload-url</code> checking instructor ownership before returning signed PUT URL.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-7" checked>
             <div class="check-label-wrap">
-              <label for="c-1-7" class="check-title">Install &amp; Configure BullMQ with Redis</label>
-              <span class="check-desc">Install <code>@nestjs/bullmq bullmq</code> in backend and register Redis connection module.</span>
+              <label for="c-1-7" class="check-title">Install &amp; Configure BullMQ with Redis <span class="check-tag">QUEUE</span></label>
+              <span class="check-desc">Configured <code>BullModule.forRootAsync()</code> in <code>AppModule</code> with dynamic Redis configuration.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-8" checked>
             <div class="check-label-wrap">
-              <label for="c-1-8" class="check-title">Build Transcoder BullMQ Worker</label>
-              <span class="check-desc">Create <code>VideoTranscodeProcessor</code> to download raw video and execute FFmpeg commands.</span>
+              <label for="c-1-8" class="check-title">Build Transcoder BullMQ Worker <span class="check-tag">WORKER</span></label>
+              <span class="check-desc">Created <code>VideoTranscodeProcessor</code> to download raw video and execute FFmpeg commands.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-9" checked>
             <div class="check-label-wrap">
-              <label for="c-1-9" class="check-title">Implement AES-128 Key &amp; IV Generation in Worker</label>
-              <span class="check-desc">Generate 16-byte random key and write <code>enc.keyinfo</code> file pointing to key delivery URL.</span>
+              <label for="c-1-9" class="check-title">Implement AES-128 Key &amp; IV Generation in Worker <span class="check-tag">SECURITY</span></label>
+              <span class="check-desc">Generates 16-byte random key and writes <code>enc.keyinfo</code> pointing to key delivery URL.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-10" checked>
             <div class="check-label-wrap">
-              <label for="c-1-10" class="check-title">Execute FFmpeg HLS Transcoding &amp; Upload Chunks</label>
-              <span class="check-desc">Produce <code>master.m3u8</code>, variant playlists, and encrypted <code>.ts</code> segments; stream all files into Garage S3.</span>
+              <label for="c-1-10" class="check-title">Execute FFmpeg HLS Transcoding &amp; Upload Chunks <span class="check-tag">STORAGE</span></label>
+              <span class="check-desc">Produces <code>master.m3u8</code>, variant playlists, and encrypted <code>.ts</code> segments; streams files into Garage S3.</span>
             </div>
           </li>
           <li class="check-item completed">
             <input type="checkbox" class="checkbox" id="c-1-11" checked>
             <div class="check-label-wrap">
-              <label for="c-1-11" class="check-title">Implement GET /api/videos/:id/key with Enrollment Check</label>
-              <span class="check-desc">Validate student enrollment or free status via ZenStack policy and return raw 16-byte binary key.</span>
+              <label for="c-1-11" class="check-title">Implement GET /api/videos/:id/key with Enrollment Check <span class="check-tag">SECURITY</span></label>
+              <span class="check-desc">Validates student enrollment or free preview status via ZenStack policy and returns raw 16-byte key.</span>
             </div>
           </li>
         </ul>
@@ -1327,70 +1369,70 @@ pnpm db:push</code></pre>
       <div class="card" style="padding: 0; overflow: hidden;">
         <div style="padding: 16px 20px; background: var(--surface-subtle); border-bottom: 1px solid var(--surface-border); display: flex; justify-content: space-between; align-items: center;">
           <strong style="font-size: 14px;">Phase 2: Consumption, Heartbeats &amp; Progress Tracking</strong>
-          <span class="badge badge-p0">Step 2</span>
+          <span class="badge badge-success">7 / 9 Complete</span>
         </div>
         <ul class="checklist">
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-1">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-1" checked>
             <div class="check-label-wrap">
-              <label for="c-2-1" class="check-title">Add LessonProgress Model to schema.zmodel</label>
-              <span class="check-desc">Define <code>LessonProgress</code> with <code>userId</code>, <code>lessonId</code>, <code>lastPlayedSeconds</code>, <code>completed</code>, and <code>@@unique([userId, lessonId])</code>.</span>
+              <label for="c-2-1" class="check-title">Add LessonProgress Model to schema.zmodel <span class="check-tag">SCHEMA</span></label>
+              <span class="check-desc">Defined <code>LessonProgress</code> with <code>userId</code>, <code>lessonId</code>, <code>lastPlayedSeconds</code>, <code>completed</code>, and <code>@@unique([userId, lessonId])</code>.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-2">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-2" checked>
             <div class="check-label-wrap">
-              <label for="c-2-2" class="check-title">Define ZenStack Policies for LessonProgress</label>
-              <span class="check-desc">Enforce that students can only read and update their own progress, while instructors and admins have read access.</span>
+              <label for="c-2-2" class="check-title">Define ZenStack Policies for LessonProgress <span class="check-tag">SECURITY</span></label>
+              <span class="check-desc">Enforce that students can only read and update their own progress, while instructors have read access.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-3">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-3" checked>
             <div class="check-label-wrap">
-              <label for="c-2-3" class="check-title">Implement POST /api/lessons/:id/heartbeat Endpoint</label>
-              <span class="check-desc">Create endpoint taking <code>{ currentSeconds, durationSeconds }</code> and upserting <code>LessonProgress</code>.</span>
+              <label for="c-2-3" class="check-title">Implement Heartbeat Endpoint <span class="check-tag">ENDPOINT</span></label>
+              <span class="check-desc">Implemented <code>POST /lesson-progress/heartbeat/:lessonId</code> taking <code>{ lastPlayedSecond, duration }</code>.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-4">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-4" checked>
             <div class="check-label-wrap">
-              <label for="c-2-4" class="check-title">Implement Auto-Complete 90% Threshold Logic</label>
-              <span class="check-desc">Automatically set <code>completed = true</code> and <code>completedAt = now()</code> once <code>currentSeconds / duration >= 0.9</code>.</span>
+              <label for="c-2-4" class="check-title">Implement Auto-Complete 90% Threshold Logic <span class="check-tag">LOGIC</span></label>
+              <span class="check-desc">Automatically marks <code>completed = true</code> and sets <code>completedAt = now()</code> once <code>lastPlayedSecond / duration >= 0.90</code>.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-5">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-5" checked>
             <div class="check-label-wrap">
-              <label for="c-2-5" class="check-title">Implement Manual POST /api/lessons/:id/toggle-complete</label>
-              <span class="check-desc">Allow students to manually mark text/video lessons as completed or uncompleted.</span>
+              <label for="c-2-5" class="check-title">Implement Manual Toggle Complete Endpoint <span class="check-tag">ENDPOINT</span></label>
+              <span class="check-desc">Implemented <code>PATCH /lesson-progress/:lessonId/complete</code> to allow students to manually toggle completion.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-6">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-6" checked>
             <div class="check-label-wrap">
-              <label for="c-2-6" class="check-title">Implement GET /api/courses/:courseId/progress Endpoint</label>
-              <span class="check-desc">Aggregate completion count, total lessons, completion percentage, and determine <code>nextLessonId</code>.</span>
+              <label for="c-2-6" class="check-title">Implement Course Progress Aggregation Endpoint <span class="check-tag">ENDPOINT</span></label>
+              <span class="check-desc">Implemented <code>GET /lesson-progress/course/:courseId/progress</code> returning percentage, completed count, and <code>nextLessonId</code>.</span>
             </div>
           </li>
-          <li class="check-item">
-            <input type="checkbox" class="checkbox" id="c-2-7">
+          <li class="check-item completed">
+            <input type="checkbox" class="checkbox" id="c-2-7" checked>
             <div class="check-label-wrap">
-              <label for="c-2-7" class="check-title">Update GET /lessons/:id to Return Resume Position</label>
-              <span class="check-desc">Return <code>lastPlayedSeconds</code> alongside lesson details so player resumes where student left off.</span>
+              <label for="c-2-7" class="check-title">Implement Single Lesson Progress Query <span class="check-tag">ENDPOINT</span></label>
+              <span class="check-desc">Implemented <code>GET /lesson-progress/:lessonId</code> returning <code>lastPlayedSeconds</code> to resume playback.</span>
             </div>
           </li>
           <li class="check-item">
             <input type="checkbox" class="checkbox" id="c-2-8">
             <div class="check-label-wrap">
-              <label for="c-2-8" class="check-title">Build Frontend Video Player with hls.js &amp; Credentials</label>
-              <span class="check-desc">Integrate <code>hls.js</code> with <code>withCredentials: true</code> to request AES-128 key and stream playback.</span>
+              <label for="c-2-8" class="check-title">Build Frontend Video Player with hls.js &amp; Credentials <span class="check-tag">FRONTEND</span></label>
+              <span class="check-desc">Wire the React/Next.js video player with <code>withCredentials: true</code> to fetch AES-128 key and stream playback.</span>
             </div>
           </li>
           <li class="check-item">
             <input type="checkbox" class="checkbox" id="c-2-9">
             <div class="check-label-wrap">
-              <label for="c-2-9" class="check-title">End-to-End Verification Test</label>
-              <span class="check-desc">Upload a raw MP4, verify HLS chunking &amp; AES encryption in Garage S3, verify player decrypts stream, and verify progress updates.</span>
+              <label for="c-2-9" class="check-title">End-to-End Browser Video Playback Verification <span class="check-tag">SMOKE TEST</span></label>
+              <span class="check-desc">Verify in browser that player streams HLS chunks, requests key from <code>/api/videos/:id/key</code>, and updates progress bars.</span>
             </div>
           </li>
         </ul>
@@ -1446,36 +1488,49 @@ pnpm db:push</code></pre>
     });
 
     // Checklist State with LocalStorage
-    const CHECK_KEY = 'lms_video_pipeline_checklist';
+    const CHECK_KEY = 'lms_video_pipeline_checklist_v2';
     const checkboxes = document.querySelectorAll('.checkbox');
     const progressFill = document.getElementById('progressFill');
     const progressText = document.getElementById('progressText');
     const toast = document.getElementById('toast');
 
+    const DEFAULT_COMPLETED = {
+      'c-1-1': true,
+      'c-1-2': true,
+      'c-1-3': true,
+      'c-1-4': true,
+      'c-1-5': true,
+      'c-1-6': true,
+      'c-1-7': true,
+      'c-1-8': true,
+      'c-1-9': true,
+      'c-1-10': true,
+      'c-1-11': true,
+      'c-2-1': true,
+      'c-2-2': true,
+      'c-2-3': true,
+      'c-2-4': true,
+      'c-2-5': true,
+      'c-2-6': true,
+      'c-2-7': true,
+      'c-2-8': false,
+      'c-2-9': false,
+    };
+
     function loadChecklist() {
       try {
         const stored = localStorage.getItem(CHECK_KEY);
-        if (stored !== null) {
-          const data = JSON.parse(stored);
-          checkboxes.forEach(cb => {
-            cb.checked = !!data[cb.id];
-            const item = cb.closest('.check-item');
-            if (cb.checked) {
-              item.classList.add('completed');
-            } else {
-              item.classList.remove('completed');
-            }
-          });
-        } else {
-          checkboxes.forEach(cb => {
-            const item = cb.closest('.check-item');
-            if (cb.checked) {
-              item.classList.add('completed');
-            } else {
-              item.classList.remove('completed');
-            }
-          });
-        }
+        const data = stored !== null ? JSON.parse(stored) : DEFAULT_COMPLETED;
+        checkboxes.forEach(cb => {
+          const isChecked = data[cb.id] !== undefined ? !!data[cb.id] : cb.checked;
+          cb.checked = isChecked;
+          const item = cb.closest('.check-item');
+          if (cb.checked) {
+            item.classList.add('completed');
+          } else {
+            item.classList.remove('completed');
+          }
+        });
         updateProgressBar();
       } catch (e) {
         console.error('Failed to load checklist state', e);
@@ -1527,4 +1582,3 @@ pnpm db:push</code></pre>
   </script>
 </body>
 </html>
-

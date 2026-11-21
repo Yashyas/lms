@@ -219,6 +219,10 @@ export class PaymentsService {
 
     // call fulfillOrder 
     const payment = await this.fulfillOrder(session)
+    // check if user payment is refunded 
+    if (!payment || payment.status !== PaymentStatus.COMPLETED) {
+      throw new BadRequestException('Payment has been refunded or cannot be fulfilled')
+    }
 
     const course = await this.db.client.course.findUnique({
       where: { id: session.metadata?.courseId },
@@ -240,10 +244,19 @@ export class PaymentsService {
   async revokeEnrollment(paymentIntentId: string) {
     if (!paymentIntentId) return
 
-    const payment = await this.db.client.payment.findUnique({
+    let payment = await this.db.client.payment.findUnique({
       where: { stripePaymentIntentId: paymentIntentId },
     })
 
+    // theoretical edgecase for webhook for refund coming first before confirm payment 
+    if (!payment) {
+      const intent = await this.stripe.paymentIntents.retrieve(paymentIntentId)
+      if (intent.metadata?.paymentId) {
+        payment = await this.db.client.payment.findUnique({
+          where: { id: intent.metadata.paymentId },
+        })
+      }
+    }
     if (!payment) {
       this.logger.warn(`No payment found for refunded intent: ${paymentIntentId}`)
       return
@@ -368,22 +381,24 @@ export class PaymentsService {
     })
   }
 
-  async markpaymentFailed(sessionOrPaymentIntentId: string, reason?: string) {
-    if (!sessionOrPaymentIntentId) {
-      throw new BadRequestException('Session or payment intent id is required')
+  async markpaymentFailed(paymentIdOrStripeId: string, reason?: string) {
+    if (!paymentIdOrStripeId) {
+      throw new BadRequestException('Payment Id is required')
     }
     // find payment by either stripeSessionId or stripepaymentIntentId 
-    const payment = await this.db.client.payment.findFirst({
-      where: {
-        OR: [
-          { stripeSessionId: sessionOrPaymentIntentId },
-          { stripePaymentIntentId: sessionOrPaymentIntentId },
-        ],
-      },
+    let payment = await this.db.client.payment.findUnique({
+      where: { id: paymentIdOrStripeId },
     })
 
+    // fallback only if someone passed a stripeSessionId
+    if (!payment && paymentIdOrStripeId.startsWith('cs_')) {
+      payment = await this.db.client.payment.findUnique({
+        where: { stripeSessionId: paymentIdOrStripeId },
+      })
+    }
+
     if (!payment) {
-      this.logger.warn(`No payment record found to mark as failed for ID: ${sessionOrPaymentIntentId}`)
+      this.logger.warn(`No payment record found to mark as failed for ID: ${paymentIdOrStripeId}`)
       return
     }
 
