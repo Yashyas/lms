@@ -170,14 +170,14 @@ export class StorageService {
       const contentType = res.ContentType ?? '';
 
       if (size === 0 || size > maxBytes) {
-        await this.deleteFile(key).catch(() => {});
+        await this.deleteFile(key).catch(() => { });
         throw new BadRequestException(
           `Uploaded file size (${Math.round(size / 1024)} KB) exceeds the maximum allowed limit of ${Math.round(maxBytes / (1024 * 1024))} MB`,
         );
       }
 
       if (!allowedMimes.includes(contentType)) {
-        await this.deleteFile(key).catch(() => {});
+        await this.deleteFile(key).catch(() => { });
         throw new BadRequestException(
           `Uploaded file MIME type "${contentType}" is not permitted`,
         );
